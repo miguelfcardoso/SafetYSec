@@ -1,0 +1,123 @@
+<resources>
+    <string name="app_name">SafetYSec</string>
+
+    <!-- Autenticação -->
+    <string name="login">Entrar</string>
+    <string name="register">Registar</string>
+    <string name="email">Email</string>
+    <string name="password">Palavra-passe</string>
+    <string name="confirm_password">Confirmar Palavra-passe</string>
+    <string name="name">Nome</string>
+    <string name="user_type">Tipo de Utilizador</string>
+    <string name="monitor">Monitor</string>
+    <string name="protected_user">Protegido</string>
+    <string name="forgot_password">Esqueceu a palavra-passe?</string>
+    <string name="reset_password">Redefinir Palavra-passe</string>
+    <string name="logout">Sair</string>
+    <string name="one_time_password">Senha de Uso Único</string>
+    <string name="otp_hint">Insira o código OTP</string>
+    <string name="verify">Verificar</string>
+    <string name="generate_otp">Gerar OTP</string>
+
+    <!-- Dashboard do Monitor -->
+    <string name="dashboard">Painel</string>
+    <string name="protected_users">Utilizadores Protegidos</string>
+    <string name="add_protected">Adicionar Protegido</string>
+    <string name="statistics">Estatísticas</string>
+    <string name="active_alerts">Alertas Ativos</string>
+    <string name="total_alerts">Total de Alertas</string>
+    <string name="create_rule">Criar Regra</string>
+    <string name="rules">Regras</string>
+    <string name="no_protected_users">Sem utilizadores protegidos</string>
+
+    <!-- Regras -->
+    <string name="rule_type">Tipo de Regra</string>
+    <string name="fall_detection">Deteção de Queda</string>
+    <string name="geofencing">Geolocalização</string>
+    <string name="speed_control">Controlo de Velocidade</string>
+    <string name="inactivity">Deteção de Inatividade</string>
+    <string name="rule_name">Nome da Regra</string>
+    <string name="rule_description">Descrição</string>
+    <string name="enable_rule">Ativar Regra</string>
+    <string name="disable_rule">Desativar Regra</string>
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+
+    <!-- Geofencing -->
+    <string name="radius">Raio (metros)</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="use_current_location">Usar Localização Atual</string>
+
+    <!-- Controlo de Velocidade -->
+    <string name="max_speed">Velocidade Máxima (km/h)</string>
+
+    <!-- Inatividade -->
+    <string name="inactivity_time">Tempo de Inatividade (minutos)</string>
+
+    <!-- Utilizador Protegido -->
+    <string name="my_profile">Meu Perfil</string>
+    <string name="monitoring_rules">Regras de Monitorização</string>
+    <string name="time_windows">Janelas Temporais</string>
+    <string name="add_time_window">Adicionar Janela Temporal</string>
+    <string name="cancel_code">Código de Cancelamento</string>
+    <string name="generate_cancel_code">Gerar Código de Cancelamento</string>
+    <string name="history">Histórico</string>
+    <string name="authorizations">Autorizações</string>
+    <string name="approve">Aprovar</string>
+    <string name="reject">Rejeitar</string>
+
+    <!-- Alertas -->
+    <string name="alert">Alerta!</string>
+    <string name="alert_detected">Alerta Detetado</string>
+    <string name="alert_type">Tipo de Alerta</string>
+    <string name="alert_location">Localização</string>
+    <string name="alert_time">Hora</string>
+    <string name="cancel_alert">Cancelar Alerta</string>
+    <string name="countdown">Contagem: %1$d segundos</string>
+    <string name="video_recording">A gravar vídeo…</string>
+    <string name="view_video">Ver Vídeo</string>
+    <string name="alert_sent">Alerta enviado aos monitores</string>
+    <string name="alert_cancelled">Alerta cancelado</string>
+
+    <!-- Janelas Temporais -->
+    <string name="start_time">Hora de Início</string>
+    <string name="end_time">Hora de Fim</string>
+    <string name="days_of_week">Dias da Semana</string>
+    <string name="monday">Segunda-feira</string>
+    <string name="tuesday">Terça-feira</string>
+    <string name="wednesday">Quarta-feira</string>
+    <string name="thursday">Quinta-feira</string>
+    <string name="friday">Sexta-feira</string>
+    <string name="saturday">Sábado</string>
+    <string name="sunday">Domingo</string>
+
+    <!-- Botão de Pânico -->
+    <string name="panic_button">Botão de Pânico</string>
+    <string name="panic_alert">Alerta de Pânico</string>
+    <string name="send_panic">Enviar Alerta de Pânico</string>
+
+    <!-- Tipos de Regra -->
+    <string name="accident">Deteção de Acidente</string>
+
+    <!-- Permissões -->
+    <string name="location_permission_required">Permissão de localização é necessária</string>
+    <string name="camera_permission_required">Permissão de câmera é necessária</string>
+    <string name="notification_permission_required">Permissão de notificações é necessária</string>
+    <string name="grant_permission">Conceder Permissão</string>
+    <string name="permission_denied">Permissão negada</string>
+
+    <!-- Comum -->
+    <string name="loading">A carregar…</string>
+    <string name="error">Erro</string>
+    <string name="success">Sucesso</string>
+    <string name="delete">Eliminar</string>
+    <string name="edit">Editar</string>
+    <string name="close">Fechar</string>
+    <string name="settings">Definições</string>
+    <string name="status">Estado</string>
+    <string name="active">Ativo</string>
+    <string name="inactive">Inativo</string>
+    <string name="date">Data</string>
+    <string name="location">Localização</string>
+</resources>
