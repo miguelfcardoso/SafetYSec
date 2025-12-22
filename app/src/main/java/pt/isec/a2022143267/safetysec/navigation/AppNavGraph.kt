@@ -1,12 +1,21 @@
 package pt.isec.a2022143267.safetysec.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import pt.isec.a2022143267.safetysec.model.UserType
 import pt.isec.a2022143267.safetysec.view.auth.LoginScreen
 import pt.isec.a2022143267.safetysec.view.auth.RegisterScreen
@@ -65,6 +74,50 @@ fun AppNavGraph(
                 navController = navController,
                 authViewModel = authViewModel
             )
+        }
+
+        composable(
+            route = Screen.MonitorProtectedDetails.route,
+            arguments = listOf(navArgument("protectedId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val protectedId = backStackEntry.arguments?.getString("protectedId") ?: ""
+            val monitorViewModel: pt.isec.a2022143267.safetysec.viewmodel.MonitorViewModel = viewModel()
+            val currentMonitorUser by authViewModel.currentUser.collectAsState()
+
+            // Load protected users for this monitor
+            LaunchedEffect(currentMonitorUser) {
+                currentMonitorUser?.let { user ->
+                    monitorViewModel.loadProtectedUsers(user.id)
+                }
+            }
+
+            // Get the protected user
+            val protectedUsers by monitorViewModel.protectedUsers.collectAsState()
+            val protectedUser = protectedUsers.find { it.id == protectedId }
+
+            if (protectedUser != null) {
+                pt.isec.a2022143267.safetysec.view.monitor.ProtectedDetailsScreen(
+                    navController = navController,
+                    protectedUser = protectedUser,
+                    monitorViewModel = monitorViewModel
+                )
+            } else if (protectedUsers.isNotEmpty()) {
+                // Protected user not found but list is loaded
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Protected user not found")
+                }
+            } else {
+                // Still loading
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
         }
 
         // Protected screens

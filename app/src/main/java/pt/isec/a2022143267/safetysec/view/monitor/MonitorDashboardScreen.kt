@@ -70,7 +70,12 @@ fun MonitorDashboardScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.dashboard)) },
                 actions = {
-                    IconButton(onClick = { authViewModel.logout() }) {
+                    IconButton(onClick = {
+                        authViewModel.logout()
+                        navController.navigate(pt.isec.a2022143267.safetysec.navigation.Screen.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }) {
                         Icon(Icons.Default.ExitToApp, contentDescription = stringResource(R.string.logout))
                     }
                 }
@@ -141,7 +146,11 @@ fun MonitorDashboardScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp),
-                        onClick = { /* Navigate to user details */ }
+                        onClick = {
+                            navController.navigate(
+                                pt.isec.a2022143267.safetysec.navigation.Screen.MonitorProtectedDetails.createRoute(user.id)
+                            )
+                        }
                     ) {
                         Row(
                             modifier = Modifier

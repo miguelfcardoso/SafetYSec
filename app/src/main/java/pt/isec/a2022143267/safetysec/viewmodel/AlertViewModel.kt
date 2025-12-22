@@ -47,6 +47,40 @@ class AlertViewModel : ViewModel() {
         }
     }
 
+    fun createPanicAlert(protectedId: String) {
+        viewModelScope.launch {
+            try {
+                _alertState.value = AlertOperationState.Loading
+
+                // Create a panic alert
+                val alert = Alert(
+                    protectedId = protectedId,
+                    monitorId = "", // Will be filled by the system for each monitor
+                    ruleId = "panic_button_${System.currentTimeMillis()}",
+                    alertType = pt.isec.a2022143267.safetysec.model.RuleType.PANIC_BUTTON,
+                    status = AlertStatus.PENDING
+                )
+
+                alertRepository.createAlert(alert)
+                    .onSuccess { alertId ->
+                        val newAlert = alert.copy(id = alertId)
+                        _currentAlert.value = newAlert
+                        _alertState.value = AlertOperationState.Countdown
+                        startCountdown(newAlert)
+                    }
+                    .onFailure { exception ->
+                        _alertState.value = AlertOperationState.Error(
+                            exception.message ?: "Failed to create panic alert"
+                        )
+                    }
+            } catch (e: Exception) {
+                _alertState.value = AlertOperationState.Error(
+                    e.message ?: "Failed to create panic alert"
+                )
+            }
+        }
+    }
+
     private suspend fun startCountdown(alert: Alert) {
         for (i in 10 downTo 1) {
             _countdown.value = i

@@ -59,6 +59,26 @@ class RuleRepository {
     }
 
     /**
+     * Toggle rule enabled/disabled
+     */
+    suspend fun toggleRule(ruleId: String, enabled: Boolean): Result<Unit> {
+        return try {
+            val updates = hashMapOf<String, Any>(
+                "isEnabled" to enabled,
+                "updatedAt" to com.google.firebase.Timestamp.now()
+            )
+
+            firestore.collection("rules")
+                .document(ruleId)
+                .update(updates)
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
      * Get rules for a protected user (real-time)
      */
     fun getRulesForProtected(protectedId: String): Flow<List<Rule>> = callbackFlow {
@@ -70,9 +90,14 @@ class RuleRepository {
                     return@addSnapshotListener
                 }
 
-                val rules = snapshot?.documents?.mapNotNull {
-                    it.toObject(Rule::class.java)
-                } ?: emptyList()
+                val rules = snapshot?.documents?.mapNotNull { doc ->
+                    doc.toObject(Rule::class.java)
+                }?.toList() ?: emptyList()  // Force new list
+
+                android.util.Log.d("RuleRepository", "Rules updated: ${rules.size} total, ${rules.count { it.isEnabled }} enabled")
+                rules.forEach {
+                    android.util.Log.d("RuleRepository", "  - ${it.name}: enabled=${it.isEnabled}")
+                }
 
                 trySend(rules)
             }

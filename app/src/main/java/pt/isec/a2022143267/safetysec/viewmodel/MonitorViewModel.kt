@@ -52,6 +52,30 @@ class MonitorViewModel : ViewModel() {
         }
     }
 
+    fun loadRulesForProtected(protectedId: String) {
+        viewModelScope.launch {
+            ruleRepository.getRulesForProtected(protectedId).collect { rules ->
+                _rules.value = rules
+            }
+        }
+    }
+
+    fun toggleRule(ruleId: String, enabled: Boolean) {
+        viewModelScope.launch {
+            ruleRepository.toggleRule(ruleId, enabled)
+                .onSuccess {
+                    _operationState.value = OperationState.Success(
+                        if (enabled) "Rule activated" else "Rule deactivated"
+                    )
+                }
+                .onFailure { exception ->
+                    _operationState.value = OperationState.Error(
+                        exception.message ?: "Failed to toggle rule"
+                    )
+                }
+        }
+    }
+
     fun loadAlerts(monitorId: String) {
         viewModelScope.launch {
             alertRepository.getAlertsForMonitor(monitorId).collect { alerts ->

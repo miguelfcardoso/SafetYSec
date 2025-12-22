@@ -9,13 +9,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import pt.isec.a2022143267.safetysec.R
-import pt.isec.a2022143267.safetysec.service.MonitoringService
 import pt.isec.a2022143267.safetysec.view.components.PanicButton
 import pt.isec.a2022143267.safetysec.viewmodel.AuthViewModel
 import pt.isec.a2022143267.safetysec.viewmodel.ProtectedViewModel
@@ -25,16 +23,38 @@ import pt.isec.a2022143267.safetysec.viewmodel.ProtectedViewModel
 fun ProtectedDashboardScreen(
     navController: NavController,
     authViewModel: AuthViewModel,
-    protectedViewModel: ProtectedViewModel = viewModel()
+    protectedViewModel: ProtectedViewModel = viewModel(),
+    alertViewModel: pt.isec.a2022143267.safetysec.viewmodel.AlertViewModel = viewModel()
 ) {
-    val context = LocalContext.current
     val currentUser by authViewModel.currentUser.collectAsState()
     val monitors by protectedViewModel.monitors.collectAsState()
-    val rules by protectedViewModel.rules.collectAsState()
     val pendingRelations by protectedViewModel.pendingRelations.collectAsState()
+    val rules by protectedViewModel.rules.collectAsState()
     val generatedOTP by protectedViewModel.generatedOTP.collectAsState()
+    val alertState by alertViewModel.alertState.collectAsState()
+
+    val snackbarHostState = remember { SnackbarHostState() }
 
     var showOTPDialog by remember { mutableStateOf(false) }
+
+    // Show alert feedback
+    LaunchedEffect(alertState) {
+        when (alertState) {
+            is pt.isec.a2022143267.safetysec.viewmodel.AlertOperationState.Countdown -> {
+                snackbarHostState.showSnackbar(
+                    message = "Panic alert sent! You have 10 seconds to cancel.",
+                    duration = SnackbarDuration.Short
+                )
+            }
+            is pt.isec.a2022143267.safetysec.viewmodel.AlertOperationState.Error -> {
+                snackbarHostState.showSnackbar(
+                    message = (alertState as pt.isec.a2022143267.safetysec.viewmodel.AlertOperationState.Error).message,
+                    duration = SnackbarDuration.Long
+                )
+            }
+            else -> {}
+        }
+    }
 
     LaunchedEffect(currentUser) {
         currentUser?.let { user ->
@@ -53,7 +73,12 @@ fun ProtectedDashboardScreen(
                     IconButton(onClick = { showOTPDialog = true }) {
                         Icon(Icons.Default.Lock, contentDescription = stringResource(R.string.generate_otp))
                     }
-                    IconButton(onClick = { authViewModel.logout() }) {
+                    IconButton(onClick = {
+                        authViewModel.logout()
+                        navController.navigate(pt.isec.a2022143267.safetysec.navigation.Screen.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }) {
                         Icon(Icons.Default.ExitToApp, contentDescription = stringResource(R.string.logout))
                     }
                 }
@@ -62,10 +87,13 @@ fun ProtectedDashboardScreen(
         floatingActionButton = {
             PanicButton(
                 onClick = {
-                    MonitoringService.triggerPanic(context)
+                    currentUser?.let { user ->
+                        alertViewModel.createPanicAlert(user.id)
+                    }
                 }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         LazyColumn(
             modifier = Modifier

@@ -146,5 +146,23 @@ class AlertRepository {
             Result.failure(e)
         }
     }
-}
 
+    /**
+     * Get all approved monitor-protected relations for a protected user
+     */
+    suspend fun getMonitorsForProtected(protectedId: String): List<pt.isec.a2022143267.safetysec.model.MonitorProtectedRelation> {
+        return try {
+            val snapshot = firestore.collection("relations")
+                .whereEqualTo("protectedId", protectedId)
+                .whereEqualTo("status", pt.isec.a2022143267.safetysec.model.RelationStatus.APPROVED.name)
+                .get()
+                .await()
+
+            snapshot.documents.mapNotNull {
+                it.toObject(pt.isec.a2022143267.safetysec.model.MonitorProtectedRelation::class.java)
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+}

@@ -11,6 +11,9 @@ sealed class Screen(val route: String) {
 
     // Monitor screens
     object MonitorDashboard : Screen("monitor_dashboard")
+    object MonitorProtectedDetails : Screen("monitor_protected_details/{protectedId}") {
+        fun createRoute(protectedId: String) = "monitor_protected_details/$protectedId"
+    }
     object MonitorProtectedList : Screen("monitor_protected_list")
     object MonitorRules : Screen("monitor_rules")
     object MonitorRuleDetail : Screen("monitor_rule_detail/{ruleId}") {
