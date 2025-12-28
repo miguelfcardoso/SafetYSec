@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import pt.isec.a2022143267.safetysec.R
+import pt.isec.a2022143267.safetysec.navigation.Screen
 import pt.isec.a2022143267.safetysec.view.components.PanicButton
 import pt.isec.a2022143267.safetysec.viewmodel.AuthViewModel
 import pt.isec.a2022143267.safetysec.viewmodel.ProtectedViewModel
@@ -72,6 +73,9 @@ fun ProtectedDashboardScreen(
                 actions = {
                     IconButton(onClick = { showOTPDialog = true }) {
                         Icon(Icons.Default.Lock, contentDescription = stringResource(R.string.generate_otp))
+                    }
+                    IconButton(onClick = { navController.navigate(Screen.Settings.route) }) {
+                        Icon(Icons.Default.Settings, contentDescription = "Definições")
                     }
                     IconButton(onClick = {
                         authViewModel.logout()

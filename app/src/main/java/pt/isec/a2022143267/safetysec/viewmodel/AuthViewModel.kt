@@ -95,6 +95,27 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+    fun updateCancelCode(newCode: String) {
+        if (newCode.length != 4 || !newCode.all { it.isDigit() }) {
+            _authState.value = AuthState.Error("O código deve ter exatamente 4 dígitos numéricos.")
+            return
+        }
+
+        viewModelScope.launch {
+            val userId = _currentUser.value?.id ?: return@launch
+            _authState.value = AuthState.Loading
+
+            authRepository.updateUserField(userId, "cancelCode", newCode)
+                .onSuccess {
+                    _currentUser.value = _currentUser.value?.copy(cancelCode = newCode)
+                    _authState.value = AuthState.Idle
+                }
+                .onFailure { e ->
+                    _authState.value = AuthState.Error(e.message ?: "Erro ao atualizar")
+                }
+        }
+    }
+
     fun logout() {
         authRepository.logout()
         _currentUser.value = null

@@ -24,6 +24,7 @@ import pt.isec.a2022143267.safetysec.view.monitor.MonitorDashboardScreen
 import pt.isec.a2022143267.safetysec.view.protected.ProtectedDashboardScreen
 import pt.isec.a2022143267.safetysec.view.protected.HistoryScreen
 import pt.isec.a2022143267.safetysec.view.alert.AlertScreen
+import pt.isec.a2022143267.safetysec.view.auth.SettingsScreen
 import pt.isec.a2022143267.safetysec.viewmodel.AuthViewModel
 
 /**
@@ -133,6 +134,12 @@ fun AppNavGraph(
                 navController = navController,
                 authViewModel = authViewModel
             )
+        }
+
+        composable(Screen.Settings.route) {
+            SettingsScreen(
+                navController = navController,
+                authViewModel = authViewModel)
         }
 
         // Alert screen (shared)

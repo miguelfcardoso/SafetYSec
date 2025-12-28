@@ -75,6 +75,17 @@ class AuthRepository {
         }
     }
 
+    suspend fun updateUserField(userId: String, field: String, value: String): Result<Unit> {
+        return try {
+            firestore.collection("users").document(userId)
+                .update(field, value)
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     /**
      * Logout current user
      */
