@@ -122,6 +122,27 @@ class AuthViewModel : ViewModel() {
         _authState.value = AuthState.Idle
     }
 
+    fun updateName(newName: String) {
+        if (newName.isBlank()) {
+            _authState.value = AuthState.Error("O nome não pode estar vazio")
+            return
+        }
+
+        viewModelScope.launch {
+            val userId = _currentUser.value?.id ?: return@launch
+            _authState.value = AuthState.Loading
+
+            authRepository.updateUserField(userId, "name", newName)
+                .onSuccess {
+                    _currentUser.value = _currentUser.value?.copy(name = newName)
+                    _authState.value = AuthState.Idle
+                }
+                .onFailure { e ->
+                    _authState.value = AuthState.Error(e.message ?: "Erro ao atualizar nome")
+                }
+        }
+    }
+
     fun resetPassword(email: String) {
         if (email.isBlank()) {
             _authState.value = AuthState.Error("Email is required")
@@ -137,6 +158,24 @@ class AuthViewModel : ViewModel() {
                 .onFailure { exception ->
                     _authState.value = AuthState.Error(exception.message ?: "Password reset failed")
                 }
+        }
+    }
+
+    fun changePassword(newPass: String, confirmPass: String) {
+        if (newPass != confirmPass) {
+            _authState.value = AuthState.Error("As passwords não coincidem")
+            return
+        }
+        if (newPass.length < 6) {
+            _authState.value = AuthState.Error("Mínimo de 6 caracteres")
+            return
+        }
+
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            authRepository.updatePassword(newPass)
+                .onSuccess { _authState.value = AuthState.Idle }
+                .onFailure { e -> _authState.value = AuthState.Error(e.message ?: "Erro ao mudar password") }
         }
     }
 

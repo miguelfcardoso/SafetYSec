@@ -105,6 +105,15 @@ class AuthRepository {
         }
     }
 
+    suspend fun updatePassword(password: String): Result<Unit> {
+        return try {
+            auth.currentUser?.updatePassword(password)?.await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     /**
      * Get current user data
      */

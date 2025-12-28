@@ -30,13 +30,18 @@ fun SettingsScreen(
     val currentUser by authViewModel.currentUser.collectAsState()
     val authState by authViewModel.authState.collectAsState()
 
-    // Estado local para o novo código de cancelamento
+    // Estados locais para os campos
+    var nameText by remember { mutableStateOf(currentUser?.name ?: "") }
     var newCancelCode by remember { mutableStateOf(currentUser?.cancelCode ?: "") }
 
+    var currentPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+
+    // Sincronizar quando os dados do Firebase chegarem
     LaunchedEffect(currentUser) {
-        if (newCancelCode.isEmpty()) {
-            newCancelCode = currentUser?.cancelCode ?: ""
-        }
+        if (nameText.isEmpty()) nameText = currentUser?.name ?: ""
+        if (newCancelCode.isEmpty()) newCancelCode = currentUser?.cancelCode ?: ""
     }
 
     Scaffold(
@@ -45,10 +50,7 @@ fun SettingsScreen(
                 title = { Text(stringResource(R.string.settings)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Voltar"
-                        )
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
                     }
                 }
             )
@@ -62,101 +64,113 @@ fun SettingsScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Cartão de Informações do Perfil
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-            ) {
+
+            // 1. DADOS PESSOAIS (Nome)
+            Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Informações da Conta",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    Text("Dados Pessoais", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Nome: ${currentUser?.name ?: "N/A"}")
-                    Text("Email: ${currentUser?.email ?: "N/A"}")
-                    Text("Tipo de Utilizador: ${currentUser?.userType?.name ?: "N/A"}")
+                    OutlinedTextField(
+                        value = nameText,
+                        onValueChange = { nameText = it },
+                        label = { Text("Nome de Utilizador") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                    Button(
+                        onClick = {
+                            authViewModel.updateName(nameText)
+                            Toast.makeText(context, "Nome atualizado!", Toast.LENGTH_SHORT).show()
+                        },
+                        enabled = nameText.isNotBlank() && nameText != currentUser?.name && authState !is AuthState.Loading,
+                        modifier = Modifier.align(Alignment.End).padding(top = 8.dp)
+                    ) {
+                        Text("Guardar Nome")
+                    }
                 }
             }
 
-            // Secção de Segurança - Apenas para o Utilizador Protegido
-            if (currentUser?.userType == UserType.PROTECTED) {
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Segurança do Alerta",
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.align(Alignment.Start)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
+            // 2. ALTERAÇÃO DE PASSWORD
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Alterar Password", style = MaterialTheme.typography.titleMedium)
+                    Spacer(modifier = Modifier.height(8.dp))
 
+                    OutlinedTextField(
+                        value = newPassword,
+                        onValueChange = { newPassword = it },
+                        label = { Text("Nova Password") },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                    )
+                    OutlinedTextField(
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        label = { Text("Confirmar Nova Password") },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                    )
+
+                    Button(
+                        onClick = {
+                            authViewModel.changePassword(newPassword, confirmPassword)
+                            newPassword = ""; confirmPassword = ""
+                            Toast.makeText(context, "Password alterada!", Toast.LENGTH_SHORT).show()
+                        },
+                        enabled = newPassword.isNotEmpty() && newPassword == confirmPassword,
+                        modifier = Modifier.align(Alignment.End).padding(top = 8.dp)
+                    ) {
+                        Text("Mudar Password")
+                    }
+                }
+            }
+
+            // 3. CÓDIGO DE CANCELAMENTO (Apenas Protegido)
+            if (currentUser?.userType == UserType.PROTECTED) {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Código de Alerta (PIN)", style = MaterialTheme.typography.titleMedium)
+                        Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
                             value = newCancelCode,
                             onValueChange = {
-                                // Garante que apenas números e no máximo 4 dígitos são inseridos
                                 if (it.length <= 4 && it.all { char -> char.isDigit() }) {
                                     newCancelCode = it
                                 }
                             },
-                            label = { Text("Código de Cancelamento (4 dígitos)") },
-                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("Novo PIN (4 dígitos)") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier.fillMaxWidth(),
                             singleLine = true
                         )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
+                        Spacer(modifier = Modifier.height(8.dp))
                         Button(
                             onClick = {
                                 authViewModel.updateCancelCode(newCancelCode)
-                                Toast.makeText(context, "Código atualizado!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "PIN atualizado!", Toast.LENGTH_SHORT).show()
                             },
-                            // O botão só ativa se tiver 4 números E for diferente do atual
                             enabled = newCancelCode.length == 4 && newCancelCode != currentUser?.cancelCode && authState !is AuthState.Loading,
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             if (authState is AuthState.Loading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                    strokeWidth = 2.dp
-                                )
+                                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                             } else {
-                                Text("Atualizar Código")
+                                Text("Atualizar PIN")
                             }
                         }
-
-                        Text(
-                            text = "Este código é usado para cancelar alertas falsos durante a contagem de 10 segundos.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
                     }
                 }
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Botão de Terminar Sessão
+            // BOTÃO LOGOUT
             Button(
                 onClick = {
                     authViewModel.logout()
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
+                    navController.navigate(Screen.Login.route) { popUpTo(0) }
                 },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Terminar Sessão")
