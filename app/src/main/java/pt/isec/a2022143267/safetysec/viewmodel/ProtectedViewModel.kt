@@ -169,5 +169,66 @@ class ProtectedViewModel : ViewModel() {
     fun clearOTP() {
         _generatedOTP.value = null
     }
-}
 
+    fun removeMonitor(protectedId: String, monitorId: String) {
+        viewModelScope.launch {
+            _operationState.value = OperationState.Loading
+            userRepository.removeMonitorRelation(protectedId, monitorId)
+                .onSuccess {
+                    _operationState.value = OperationState.Success("Monitor removed")
+                }
+                .onFailure { exception ->
+                    _operationState.value = OperationState.Error(
+                        exception.message ?: "Failed to remove monitor"
+                    )
+                }
+        }
+    }
+
+    fun updateRuleStatus(ruleId: String, isEnabled: Boolean) {
+        viewModelScope.launch {
+            _operationState.value = OperationState.Loading
+            ruleRepository.updateRuleStatus(ruleId, isEnabled)
+                .onSuccess {
+                    _operationState.value = OperationState.Success(
+                        if (isEnabled) "Rule activated" else "Rule deactivated"
+                    )
+                }
+                .onFailure { exception ->
+                    _operationState.value = OperationState.Error(
+                        exception.message ?: "Failed to update rule"
+                    )
+                }
+        }
+    }
+
+    fun revokeRule(ruleId: String) {
+        viewModelScope.launch {
+            _operationState.value = OperationState.Loading
+            ruleRepository.deleteRule(ruleId)
+                .onSuccess {
+                    _operationState.value = OperationState.Success("Rule revoked")
+                }
+                .onFailure { exception ->
+                    _operationState.value = OperationState.Error(
+                        exception.message ?: "Failed to revoke rule"
+                    )
+                }
+        }
+    }
+
+    fun deleteAlert(alertId: String) {
+        viewModelScope.launch {
+            _operationState.value = OperationState.Loading
+            alertRepository.deleteAlert(alertId)
+                .onSuccess {
+                    _operationState.value = OperationState.Success("Alert deleted")
+                }
+                .onFailure { exception ->
+                    _operationState.value = OperationState.Error(
+                        exception.message ?: "Failed to delete alert"
+                    )
+                }
+        }
+    }
+}

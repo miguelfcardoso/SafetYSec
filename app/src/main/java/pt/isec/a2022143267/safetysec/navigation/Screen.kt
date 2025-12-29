@@ -12,6 +12,7 @@ sealed class Screen(val route: String) {
 
     // Monitor screens
     object MonitorDashboard : Screen("monitor_dashboard")
+    object MonitorSettings : Screen("monitor_settings")
     object MonitorProtectedDetails : Screen("monitor_protected_details/{protectedId}") {
         fun createRoute(protectedId: String) = "monitor_protected_details/$protectedId"
     }
@@ -31,6 +32,7 @@ sealed class Screen(val route: String) {
     object ProtectedProfile : Screen("protected_profile")
     object ProtectedRules : Screen("protected_rules")
     object ProtectedTimeWindows : Screen("protected_time_windows")
+    object ProtectedMonitors : Screen("protected_monitors")
     object ProtectedAuthorizations : Screen("protected_authorizations")
     object ProtectedHistory : Screen("protected_history")
     object ProtectedGenerateOTP : Screen("protected_generate_otp")

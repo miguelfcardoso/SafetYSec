@@ -7,8 +7,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import pt.isec.a2022143267.safetysec.MainActivity
 import pt.isec.a2022143267.safetysec.R
 
@@ -16,6 +21,9 @@ import pt.isec.a2022143267.safetysec.R
  * Service to handle Firebase Cloud Messaging notifications
  */
 class FirebaseMessagingService : FirebaseMessagingService() {
+
+    private val auth = FirebaseAuth.getInstance()
+    private val firestore = FirebaseFirestore.getInstance()
 
     companion object {
         private const val CHANNEL_ID = "alerts_channel"
@@ -41,8 +49,19 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        // Send token to your server or save it to Firebase Firestore
-        // associated with the current user
+        // Save token to Firestore for the current user
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    firestore.collection("users")
+                        .document(userId)
+                        .update("fcmToken", token)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
     }
 
     private fun handleDataPayload(data: Map<String, String>) {

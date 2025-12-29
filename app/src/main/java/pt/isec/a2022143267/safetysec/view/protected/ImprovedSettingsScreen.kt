@@ -11,7 +11,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,7 +30,7 @@ import pt.isec.a2022143267.safetysec.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(
+fun ImprovedSettingsScreen(
     navController: NavController,
     authViewModel: AuthViewModel
 ) {
@@ -515,7 +514,7 @@ fun SettingsScreen(
                     contentPadding = PaddingValues(16.dp)
                 ) {
                     Icon(
-                        Icons.AutoMirrored.Filled.ExitToApp,
+                        Icons.Default.ExitToApp,
                         contentDescription = null,
                         modifier = Modifier.size(20.dp)
                     )
@@ -526,3 +525,4 @@ fun SettingsScreen(
         }
     }
 }
+

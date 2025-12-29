@@ -71,6 +71,11 @@ fun MonitorDashboardScreen(
                 title = { Text(stringResource(R.string.dashboard)) },
                 actions = {
                     IconButton(onClick = {
+                        navController.navigate(Screen.MonitorSettings.route)
+                    }) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                    }
+                    IconButton(onClick = {
                         authViewModel.logout()
                         navController.navigate(pt.isec.a2022143267.safetysec.navigation.Screen.Login.route) {
                             popUpTo(0) { inclusive = true }

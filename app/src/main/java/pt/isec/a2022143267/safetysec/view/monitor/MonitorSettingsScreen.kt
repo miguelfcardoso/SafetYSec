@@ -1,4 +1,4 @@
-package pt.isec.a2022143267.safetysec.view.auth
+package pt.isec.a2022143267.safetysec.view.monitor
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -24,14 +24,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import pt.isec.a2022143267.safetysec.R
-import pt.isec.a2022143267.safetysec.model.UserType
 import pt.isec.a2022143267.safetysec.navigation.Screen
 import pt.isec.a2022143267.safetysec.viewmodel.AuthState
 import pt.isec.a2022143267.safetysec.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(
+fun MonitorSettingsScreen(
     navController: NavController,
     authViewModel: AuthViewModel
 ) {
@@ -41,7 +40,6 @@ fun SettingsScreen(
 
     // Local states for form fields
     var nameText by remember { mutableStateOf(currentUser?.name ?: "") }
-    var newCancelCode by remember { mutableStateOf(currentUser?.cancelCode ?: "") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
@@ -50,12 +48,10 @@ fun SettingsScreen(
     // Expanded states for cards
     var isPersonalInfoExpanded by remember { mutableStateOf(true) }
     var isPasswordExpanded by remember { mutableStateOf(false) }
-    var isCancelCodeExpanded by remember { mutableStateOf(false) }
 
-    // Update fields when user data loads
+    // Update name when user data loads
     LaunchedEffect(currentUser) {
         if (nameText.isEmpty()) nameText = currentUser?.name ?: ""
-        if (newCancelCode.isEmpty()) newCancelCode = currentUser?.cancelCode ?: ""
     }
 
     // Show feedback messages
@@ -66,6 +62,15 @@ fun SettingsScreen(
                     message = (authState as AuthState.Error).message,
                     duration = SnackbarDuration.Short
                 )
+            }
+            is AuthState.Idle -> {
+                // Success state - show success message for updates
+                if (nameText != currentUser?.name && currentUser?.name == nameText) {
+                    snackbarHostState.showSnackbar(
+                        message = "Name updated successfully!",
+                        duration = SnackbarDuration.Short
+                    )
+                }
             }
             else -> {}
         }
@@ -122,21 +127,21 @@ fun SettingsScreen(
                     Surface(
                         modifier = Modifier.size(64.dp),
                         shape = MaterialTheme.shapes.medium,
-                        color = MaterialTheme.colorScheme.secondary
+                        color = MaterialTheme.colorScheme.primary
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
                                 Icons.Default.Person,
                                 contentDescription = null,
                                 modifier = Modifier.size(32.dp),
-                                tint = MaterialTheme.colorScheme.onSecondary
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
                         Text(
-                            text = currentUser?.name ?: "Protected User",
+                            text = currentUser?.name ?: "Monitor",
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -148,7 +153,7 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.height(4.dp))
                         AssistChip(
                             onClick = { },
-                            label = { Text("Protected") },
+                            label = { Text("Monitor") },
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.CheckCircle,
@@ -157,9 +162,9 @@ fun SettingsScreen(
                                 )
                             },
                             colors = AssistChipDefaults.assistChipColors(
-                                containerColor = MaterialTheme.colorScheme.secondary,
-                                labelColor = MaterialTheme.colorScheme.onSecondary,
-                                leadingIconContentColor = MaterialTheme.colorScheme.onSecondary
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                labelColor = MaterialTheme.colorScheme.onPrimary,
+                                leadingIconContentColor = MaterialTheme.colorScheme.onPrimary
                             )
                         )
                     }
@@ -389,107 +394,6 @@ fun SettingsScreen(
                 }
             }
 
-            // Cancellation Code Card (Protected users only)
-            if (currentUser?.userType == UserType.PROTECTED) {
-                ElevatedCard(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = { isCancelCodeExpanded = !isCancelCodeExpanded }
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    Icons.Default.Warning,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Text(
-                                    "Alert Cancellation PIN",
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                            }
-                            Icon(
-                                if (isCancelCodeExpanded) Icons.Default.KeyboardArrowUp
-                                else Icons.Default.KeyboardArrowDown,
-                                contentDescription = null
-                            )
-                        }
-
-                        AnimatedVisibility(
-                            visible = isCancelCodeExpanded,
-                            enter = expandVertically() + fadeIn(),
-                            exit = shrinkVertically() + fadeOut()
-                        ) {
-                            Column(modifier = Modifier.padding(top = 16.dp)) {
-                                Text(
-                                    text = "This PIN is used to cancel false alerts within 10 seconds",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(bottom = 12.dp)
-                                )
-
-                                OutlinedTextField(
-                                    value = newCancelCode,
-                                    onValueChange = {
-                                        if (it.length <= 4 && it.all { char -> char.isDigit() }) {
-                                            newCancelCode = it
-                                        }
-                                    },
-                                    label = { Text("New PIN (4 digits)") },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    singleLine = true,
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    leadingIcon = {
-                                        Icon(Icons.Default.Warning, contentDescription = null)
-                                    },
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                        focusedLabelColor = MaterialTheme.colorScheme.primary
-                                    )
-                                )
-
-                                Spacer(modifier = Modifier.height(12.dp))
-
-                                Button(
-                                    onClick = {
-                                        authViewModel.updateCancelCode(newCancelCode)
-                                    },
-                                    enabled = newCancelCode.length == 4 &&
-                                             newCancelCode != currentUser?.cancelCode &&
-                                             authState !is AuthState.Loading,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentPadding = PaddingValues(16.dp)
-                                ) {
-                                    if (authState is AuthState.Loading) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(20.dp),
-                                            strokeWidth = 2.dp,
-                                            color = MaterialTheme.colorScheme.onPrimary
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                    }
-                                    Text("Update PIN")
-                                }
-
-                                if (newCancelCode.isNotEmpty() && newCancelCode.length < 4) {
-                                    Text(
-                                        text = "PIN must be exactly 4 digits",
-                                        color = MaterialTheme.colorScheme.error,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        modifier = Modifier.padding(start = 16.dp, top = 8.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             Spacer(modifier = Modifier.weight(1f))
 
             // Logout Button
@@ -526,3 +430,4 @@ fun SettingsScreen(
         }
     }
 }
+

@@ -289,6 +289,12 @@ class MonitoringService : Service(), SensorEventListener {
                     .get()
                     .await()
 
+                if (relationsSnapshot.documents.isEmpty()) {
+                    // No monitors, no need to create alert
+                    return@launch
+                }
+
+                // Create alert for each monitor
                 relationsSnapshot.documents.forEach { doc ->
                     val monitorId = doc.getString("monitorId") ?: return@forEach
 
@@ -308,8 +314,10 @@ class MonitoringService : Service(), SensorEventListener {
                     val alertRef = firestore.collection("alerts").document()
                     alertRef.set(alert.copy(id = alertRef.id)).await()
 
-                    // Notify the user through a broadcast or notification
-                    sendAlertNotification(alertRef.id, type)
+                    // Notify the protected user (only once, not for each monitor)
+                    if (doc == relationsSnapshot.documents.first()) {
+                        sendAlertNotificationToProtected(alertRef.id, type)
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -317,9 +325,13 @@ class MonitoringService : Service(), SensorEventListener {
         }
     }
 
-    private fun sendAlertNotification(alertId: String, type: RuleType) {
+    /**
+     * Send notification to protected user giving them 10 seconds to cancel
+     */
+    private fun sendAlertNotificationToProtected(alertId: String, type: RuleType) {
         val intent = Intent(this, MainActivity::class.java).apply {
             putExtra("alertId", alertId)
+            putExtra("showAlertScreen", true)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 
@@ -331,12 +343,14 @@ class MonitoringService : Service(), SensorEventListener {
         )
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("⚠️ Safety Alert")
-            .setContentText("${type.name} detected! You have 10 seconds to cancel.")
+            .setContentTitle("⚠️ Safety Alert Detected!")
+            .setContentText("${type.name.replace("_", " ")} - You have 10 seconds to cancel")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
+            .setFullScreenIntent(pendingIntent, true) // Show as full screen for urgent alerts
             .build()
 
         val notificationManager = getSystemService(NotificationManager::class.java)

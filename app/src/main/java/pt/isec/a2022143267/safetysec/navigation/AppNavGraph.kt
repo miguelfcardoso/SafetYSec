@@ -21,6 +21,7 @@ import pt.isec.a2022143267.safetysec.view.auth.LoginScreen
 import pt.isec.a2022143267.safetysec.view.auth.RegisterScreen
 import pt.isec.a2022143267.safetysec.view.auth.ForgotPasswordScreen
 import pt.isec.a2022143267.safetysec.view.monitor.MonitorDashboardScreen
+import pt.isec.a2022143267.safetysec.view.monitor.MonitorSettingsScreen
 import pt.isec.a2022143267.safetysec.view.protected.ProtectedDashboardScreen
 import pt.isec.a2022143267.safetysec.view.protected.HistoryScreen
 import pt.isec.a2022143267.safetysec.view.alert.AlertScreen
@@ -72,6 +73,13 @@ fun AppNavGraph(
         // Monitor screens
         composable(Screen.MonitorDashboard.route) {
             MonitorDashboardScreen(
+                navController = navController,
+                authViewModel = authViewModel
+            )
+        }
+
+        composable(Screen.MonitorSettings.route) {
+            MonitorSettingsScreen(
                 navController = navController,
                 authViewModel = authViewModel
             )
@@ -131,6 +139,27 @@ fun AppNavGraph(
 
         composable(Screen.ProtectedHistory.route) {
             HistoryScreen(
+                navController = navController,
+                authViewModel = authViewModel
+            )
+        }
+
+        composable(Screen.ProtectedTimeWindows.route) {
+            pt.isec.a2022143267.safetysec.view.protected.TimeWindowsScreen(
+                navController = navController,
+                authViewModel = authViewModel
+            )
+        }
+
+        composable(Screen.ProtectedMonitors.route) {
+            pt.isec.a2022143267.safetysec.view.protected.MonitorsListScreen(
+                navController = navController,
+                authViewModel = authViewModel
+            )
+        }
+
+        composable(Screen.ProtectedRules.route) {
+            pt.isec.a2022143267.safetysec.view.protected.ProtectedRulesScreen(
                 navController = navController,
                 authViewModel = authViewModel
             )

@@ -48,6 +48,11 @@ fun AlertScreen(
     var showCancelDialog by remember { mutableStateOf(false) }
     var previewView: PreviewView? by remember { mutableStateOf(null) }
 
+    // Initialize video recording helper
+    LaunchedEffect(Unit) {
+        alertViewModel.initializeVideoRecording(context, lifecycleOwner)
+    }
+
     // Permission handling
     val permissionsState = rememberMultiplePermissionsState(
         permissions = listOf(
@@ -64,8 +69,10 @@ fun AlertScreen(
 
     // Auto-start recording when alert becomes active
     LaunchedEffect(alertState) {
-        if (alertState is AlertOperationState.Active && permissionsState.allPermissionsGranted) {
-            // Recording should start automatically
+        if (alertState is AlertOperationState.Active &&
+            permissionsState.allPermissionsGranted &&
+            previewView != null) {
+            alertViewModel.startVideoRecording(previewView!!)
         }
     }
 

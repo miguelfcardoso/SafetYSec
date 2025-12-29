@@ -92,7 +92,7 @@ fun ProtectedDashboardScreen(
             PanicButton(
                 onClick = {
                     currentUser?.let { user ->
-                        alertViewModel.createPanicAlert(user.id)
+                        alertViewModel.createPanicAlert(user.id, user)
                     }
                 }
             )
@@ -192,6 +192,57 @@ fun ProtectedDashboardScreen(
                             }
                         }
                     }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            // Quick Access Cards
+            item {
+                Text(
+                    text = "Quick Access",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    QuickAccessCard(
+                        title = "Time Windows",
+                        icon = Icons.Default.DateRange,
+                        onClick = { navController.navigate(Screen.ProtectedTimeWindows.route) },
+                        modifier = Modifier.weight(1f)
+                    )
+                    QuickAccessCard(
+                        title = "My Monitors",
+                        icon = Icons.Default.Person,
+                        onClick = { navController.navigate(Screen.ProtectedMonitors.route) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    QuickAccessCard(
+                        title = "Active Rules",
+                        icon = Icons.Default.Settings,
+                        onClick = { navController.navigate(Screen.ProtectedRules.route) },
+                        modifier = Modifier.weight(1f)
+                    )
+                    QuickAccessCard(
+                        title = "History",
+                        icon = Icons.Default.Info,
+                        onClick = { navController.navigate(Screen.ProtectedHistory.route) },
+                        modifier = Modifier.weight(1f)
+                    )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -485,3 +536,38 @@ fun ProtectedDashboardScreen(
     }
 }
 
+@Composable
+fun QuickAccessCard(
+    title: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        onClick = onClick,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                icon,
+                contentDescription = null,
+                modifier = Modifier.size(40.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelLarge,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+        }
+    }
+}

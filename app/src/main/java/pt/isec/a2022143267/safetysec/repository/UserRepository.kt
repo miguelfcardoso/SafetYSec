@@ -213,5 +213,25 @@ class UserRepository {
 
         awaitClose { listener.remove() }
     }
-}
 
+    /**
+     * Remove monitor-protected relation
+     */
+    suspend fun removeMonitorRelation(protectedId: String, monitorId: String): Result<Unit> {
+        return try {
+            val querySnapshot = firestore.collection("relations")
+                .whereEqualTo("protectedId", protectedId)
+                .whereEqualTo("monitorId", monitorId)
+                .get()
+                .await()
+
+            querySnapshot.documents.forEach { doc ->
+                doc.reference.delete().await()
+            }
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+}

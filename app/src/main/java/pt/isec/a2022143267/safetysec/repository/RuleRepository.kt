@@ -177,5 +177,19 @@ class RuleRepository {
             Result.failure(e)
         }
     }
-}
 
+    /**
+     * Update rule status (enabled/disabled)
+     */
+    suspend fun updateRuleStatus(ruleId: String, isEnabled: Boolean): Result<Unit> {
+        return try {
+            firestore.collection("rules")
+                .document(ruleId)
+                .update("isEnabled", isEnabled)
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+}

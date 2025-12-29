@@ -10,6 +10,7 @@ import com.google.firebase.Timestamp
  * @param userType User type (MONITOR or PROTECTED)
  * @param createdAt Account creation timestamp
  * @param cancelCode Cancellation code for protected users
+ * @param fcmToken Firebase Cloud Messaging token for push notifications
  */
 data class User(
     val id: String = "",
@@ -17,7 +18,8 @@ data class User(
     val email: String = "",
     val userType: UserType = UserType.PROTECTED,
     val createdAt: Timestamp = Timestamp.now(),
-    val cancelCode: String = ""
+    val cancelCode: String = "",
+    val fcmToken: String = ""
 )
 
 enum class UserType {

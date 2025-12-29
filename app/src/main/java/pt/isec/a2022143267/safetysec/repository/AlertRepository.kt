@@ -165,4 +165,40 @@ class AlertRepository {
             emptyList()
         }
     }
+
+    /**
+     * Delete an alert
+     */
+    suspend fun deleteAlert(alertId: String): Result<Unit> {
+        return try {
+            firestore.collection("alerts")
+                .document(alertId)
+                .delete()
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Get alert by ID
+     */
+    suspend fun getAlertById(alertId: String): Result<Alert> {
+        return try {
+            val document = firestore.collection("alerts")
+                .document(alertId)
+                .get()
+                .await()
+
+            val alert = document.toObject(Alert::class.java)
+            if (alert != null) {
+                Result.success(alert)
+            } else {
+                Result.failure(Exception("Alert not found"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
