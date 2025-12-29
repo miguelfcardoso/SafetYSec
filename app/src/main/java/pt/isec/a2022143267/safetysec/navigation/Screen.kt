@@ -6,6 +6,7 @@ package pt.isec.a2022143267.safetysec.navigation
 sealed class Screen(val route: String) {
     // Authentication screens
     object Login : Screen("login")
+    object MFA : Screen("mfa")
     object Register : Screen("register")
     object ForgotPassword : Screen("forgot_password")
     object Settings : Screen("settings")

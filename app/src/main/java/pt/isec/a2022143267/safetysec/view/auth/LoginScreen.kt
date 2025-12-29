@@ -28,6 +28,10 @@ fun LoginScreen(
 
     // Navigate when authenticated
     LaunchedEffect(authState) {
+        if (authState is AuthState.NeedsMFA) {
+            navController.navigate(Screen.MFA.route)
+        }
+
         if (authState is AuthState.Authenticated && currentUser != null) {
             val destination = if (currentUser?.userType == pt.isec.a2022143267.safetysec.model.UserType.MONITOR) {
                 Screen.MonitorDashboard.route

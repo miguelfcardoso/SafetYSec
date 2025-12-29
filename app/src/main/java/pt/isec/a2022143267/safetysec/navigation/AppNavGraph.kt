@@ -25,6 +25,7 @@ import pt.isec.a2022143267.safetysec.view.monitor.MonitorSettingsScreen
 import pt.isec.a2022143267.safetysec.view.protected.ProtectedDashboardScreen
 import pt.isec.a2022143267.safetysec.view.protected.HistoryScreen
 import pt.isec.a2022143267.safetysec.view.alert.AlertScreen
+import pt.isec.a2022143267.safetysec.view.auth.MFAScreen
 import pt.isec.a2022143267.safetysec.view.auth.SettingsScreen
 import pt.isec.a2022143267.safetysec.viewmodel.AuthViewModel
 
@@ -51,6 +52,13 @@ fun AppNavGraph(
         // Authentication screens
         composable(Screen.Login.route) {
             LoginScreen(
+                navController = navController,
+                authViewModel = authViewModel
+            )
+        }
+
+        composable(Screen.MFA.route) {
+            MFAScreen(
                 navController = navController,
                 authViewModel = authViewModel
             )

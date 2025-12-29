@@ -84,15 +84,15 @@ class AuthViewModel : ViewModel() {
 
         viewModelScope.launch {
             _authState.value = AuthState.Loading
-            authRepository.login(email, password)
-                .onSuccess { user ->
-                    _currentUser.value = user
-                    _authState.value = AuthState.Authenticated
-                }
-                .onFailure { exception ->
-                    _authState.value = AuthState.Error(exception.message ?: "Login failed")
-                }
+            authRepository.login(email, password).onSuccess { user ->
+                _currentUser.value = user
+                _authState.value = AuthState.NeedsMFA
+            }.onFailure { _authState.value = AuthState.Error(it.message ?: "Erro") }
         }
+    }
+
+    fun completeMFA() {
+        _authState.value = AuthState.Authenticated
     }
 
     fun updateCancelCode(newCode: String) {
@@ -188,6 +188,7 @@ sealed class AuthState {
     object Idle : AuthState()
     object Loading : AuthState()
     object Authenticated : AuthState()
+    object NeedsMFA : AuthState()
     object PasswordResetSent : AuthState()
     data class Error(val message: String) : AuthState()
 }
