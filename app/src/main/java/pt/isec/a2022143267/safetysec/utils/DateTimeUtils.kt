@@ -1,5 +1,6 @@
 package pt.isec.a2022143267.safetysec.utils
 
+import pt.isec.a2022143267.safetysec.model.TimeWindow
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -51,6 +52,25 @@ object DateTimeUtils {
             // Window spans midnight
             currentMinutes >= startMinutes || currentMinutes <= endMinutes
         }
+    }
+
+    fun isNowInTimeWindow(window: TimeWindow): Boolean {
+        val now = Calendar.getInstance()
+        val dayOfWeek = now.get(Calendar.DAY_OF_WEEK) // 1 = Domingo, 2 = Segunda...
+
+        // Converter o dia da semana do Calendar para o formato do seu modelo (1=Seg, 7=Dom)
+        val convertedDay = if (dayOfWeek == Calendar.SUNDAY) 7 else dayOfWeek - 1
+
+        if (!window.daysOfWeek.contains(convertedDay)) return false
+
+        val nowHour = now.get(Calendar.HOUR_OF_DAY)
+        val nowMinute = now.get(Calendar.MINUTE)
+
+        val startMinutes = window.startHour * 60 + window.startMinute
+        val endMinutes = window.endHour * 60 + window.endMinute
+        val currentMinutes = nowHour * 60 + nowMinute
+
+        return currentMinutes in startMinutes..endMinutes
     }
 }
 

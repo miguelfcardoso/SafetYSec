@@ -23,6 +23,7 @@ import kotlinx.coroutines.tasks.await
 import pt.isec.a2022143267.safetysec.MainActivity
 import pt.isec.a2022143267.safetysec.R
 import pt.isec.a2022143267.safetysec.model.*
+import pt.isec.a2022143267.safetysec.utils.DateTimeUtils
 import pt.isec.a2022143267.safetysec.utils.LocationUtils
 import kotlin.math.abs
 import kotlin.math.sqrt
@@ -42,6 +43,7 @@ class MonitoringService : Service(), SensorEventListener {
     private val auth = FirebaseAuth.getInstance()
 
     private var lastUpdateTime: Long = System.currentTimeMillis()
+    private var activeTimeWindows = mutableListOf<TimeWindow>()
     private var lastLocation: Location? = null
     private var currentLocation: Location? = null
 
@@ -116,6 +118,12 @@ class MonitoringService : Service(), SensorEventListener {
 
         serviceScope.launch {
             try {
+                firestore.collection("timeWindows")
+                    .whereEqualTo("protectedId", userId)
+                    .whereEqualTo("isEnabled", true)
+                    .addSnapshotListener { snapshot, _ ->
+                        activeTimeWindows = snapshot?.toObjects(TimeWindow::class.java) ?: mutableListOf()
+                    }
                 firestore.collection("rules")
                     .whereEqualTo("protectedId", userId)
                     .whereEqualTo("isEnabled", true)
@@ -125,7 +133,7 @@ class MonitoringService : Service(), SensorEventListener {
                         activeRules.clear()
                         snapshot?.documents?.forEach { doc ->
                             doc.toObject(Rule::class.java)?.let { rule ->
-                                if (isInTimeWindow(userId)) {
+                                if (isInTimeWindow()) {
                                     activeRules.add(rule)
                                 }
                             }
@@ -137,10 +145,12 @@ class MonitoringService : Service(), SensorEventListener {
         }
     }
 
-    private fun isInTimeWindow(userId: String): Boolean {
-        // Check if current time is within any active time window
-        // This is a simplified version - you should implement full time window checking
-        return true
+    private fun isInTimeWindow(): Boolean {
+        if (activeTimeWindows.isEmpty()) return true
+
+        return activeTimeWindows.any { window ->
+            DateTimeUtils.isNowInTimeWindow(window)
+        }
     }
 
     private fun setupLocationUpdates() {
@@ -153,6 +163,8 @@ class MonitoringService : Service(), SensorEventListener {
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
+                if (!isInTimeWindow()) return
+
                 lastLocation = currentLocation
                 currentLocation = locationResult.lastLocation
                 checkSpeedAndGeofencing()
@@ -172,6 +184,8 @@ class MonitoringService : Service(), SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
+        if (!isInTimeWindow()) return
+
         if (event?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
             val x = event.values[0]
             val y = event.values[1]
