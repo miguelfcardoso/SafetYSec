@@ -108,7 +108,7 @@ fun ProtectedDashboardScreen(
             // Welcome section
             item {
                 Text(
-                    text = "Welcome, ${currentUser?.name ?: "User"}",
+                    text = stringResource(R.string.welcome_user, currentUser?.name ?: stringResource(R.string.protected_user)),
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )

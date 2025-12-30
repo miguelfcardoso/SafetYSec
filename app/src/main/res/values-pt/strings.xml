@@ -64,6 +64,7 @@
     <string name="add_time_window">Adicionar Janela Temporal</string>
     <string name="cancel_code">Código de Cancelamento</string>
     <string name="generate_cancel_code">Gerar Código de Cancelamento</string>
+    <string name="enter_cancel_code">Coloque o Código de Cancelamento:</string>
     <string name="history">Histórico</string>
     <string name="authorizations">Autorizações</string>
     <string name="approve">Aprovar</string>
@@ -126,4 +127,7 @@
     <string name="location">Localização</string>
     <string name="welcome_user">Bem-vindo, %1$s</string>
     <string name="alerts_count">%1$d alertas</string>
+    <string name="video_uploaded">Vídeo gravado e enviado</string>
+    <string name="enter_email">Introduza o seu email para receber instruções de redefinição de palavra-passe</string>
+    <string name="reset_email_sent">Email de redefinição de palavra-passe enviado! Verifique a sua caixa de entrada</string>
 </resources>

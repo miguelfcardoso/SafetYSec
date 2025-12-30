@@ -167,11 +167,11 @@ fun AlertScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Alert sent to monitors",
+                            text = stringResource(R.string.alert_sent),
                             style = MaterialTheme.typography.headlineMedium
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text("Video recorded and uploaded")
+                        Text(text = stringResource(R.string.video_uploaded))
                         Spacer(modifier = Modifier.height(32.dp))
                         Button(onClick = { navController.navigateUp() }) {
                             Text(stringResource(R.string.close))
@@ -209,7 +209,7 @@ fun AlertScreen(
             title = { Text(stringResource(R.string.cancel_alert)) },
             text = {
                 Column {
-                    Text("Enter your cancellation code:")
+                    Text(text = stringResource(R.string.enter_cancel_code))
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = cancelCode,

@@ -64,6 +64,7 @@
     <string name="add_time_window">Add Time Window</string>
     <string name="cancel_code">Cancellation Code</string>
     <string name="generate_cancel_code">Generate Cancellation Code</string>
+    <string name="enter_cancel_code">Enter Cancellation Code:</string>
     <string name="history">History</string>
     <string name="authorizations">Authorizations</string>
     <string name="approve">Approve</string>
@@ -126,4 +127,7 @@
     <string name="location">Location</string>
     <string name="welcome_user">Welcome, %1$s</string>
     <string name="alerts_count">%1$d alerts</string>
+    <string name="video_uploaded">Video recorded and uploaded</string>
+    <string name="enter_email">Enter your email to receive password reset instructions</string>
+    <string name="reset_email_sent">Password reset email sent! Check your inbox.</string>
 </resources>

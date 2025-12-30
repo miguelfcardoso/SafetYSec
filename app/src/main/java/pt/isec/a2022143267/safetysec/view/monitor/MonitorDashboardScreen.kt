@@ -104,7 +104,7 @@ fun MonitorDashboardScreen(
             // Welcome section
             item {
                 Text(
-                    text = "Welcome, ${currentUser?.name ?: "Monitor"}",
+                    text = stringResource(R.string.welcome_user, currentUser?.name ?: stringResource(R.string.monitor)),
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -218,7 +218,7 @@ fun MonitorDashboardScreen(
 
             item {
                 Text(
-                    text = "Estatísticas de Segurança",
+                    text = stringResource(R.string.security_stats),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
@@ -321,6 +321,18 @@ fun MonitorDashboardScreen(
 }
 
 @Composable
+fun getTranslatedRuleType(type: pt.isec.a2022143267.safetysec.model.RuleType): String {
+    return when (type) {
+        pt.isec.a2022143267.safetysec.model.RuleType.FALL_DETECTION -> stringResource(R.string.fall_detection)
+        pt.isec.a2022143267.safetysec.model.RuleType.GEOFENCING -> stringResource(R.string.geofencing)
+        pt.isec.a2022143267.safetysec.model.RuleType.SPEED_CONTROL -> stringResource(R.string.speed_control)
+        pt.isec.a2022143267.safetysec.model.RuleType.INACTIVITY -> stringResource(R.string.inactivity)
+        pt.isec.a2022143267.safetysec.model.RuleType.PANIC_BUTTON -> stringResource(R.string.panic_button)
+        else -> type.name
+    }
+}
+
+@Composable
 fun StatisticsSection(stats: List<AlertStats>) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
@@ -343,7 +355,7 @@ fun StatisticsSection(stats: List<AlertStats>) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = stat.type.name.replace("_", " "), style = MaterialTheme.typography.labelMedium)
+                        Text(text = getTranslatedRuleType(stat.type), style = MaterialTheme.typography.labelMedium)
                         Text(text = "${stat.count} alertas", style = MaterialTheme.typography.labelSmall)
                     }
                     Spacer(modifier = Modifier.height(4.dp))

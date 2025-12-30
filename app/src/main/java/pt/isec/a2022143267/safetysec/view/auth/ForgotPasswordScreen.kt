@@ -62,7 +62,7 @@ fun ForgotPasswordScreen(
             )
 
             Text(
-                text = "Enter your email to receive password reset instructions",
+                text = stringResource(R.string.enter_email),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
@@ -101,7 +101,7 @@ fun ForgotPasswordScreen(
                 is AuthState.PasswordResetSent -> {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Password reset email sent! Check your inbox.",
+                        text = stringResource(R.string.reset_email_sent),
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.bodyMedium
                     )
