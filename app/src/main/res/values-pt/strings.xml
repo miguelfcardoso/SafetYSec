@@ -29,6 +29,8 @@
     <string name="create_rule">Criar Regra</string>
     <string name="rules">Regras</string>
     <string name="no_protected_users">Sem utilizadores protegidos</string>
+    <string name="security_stats">Estatísticas de Segurança</string>
+    <string name="no_stats_data">Sem dados históricos suficientes.</string>
 
     <!-- Regras -->
     <string name="rule_type">Tipo de Regra</string>
@@ -66,6 +68,7 @@
     <string name="authorizations">Autorizações</string>
     <string name="approve">Aprovar</string>
     <string name="reject">Rejeitar</string>
+    <string name="stats_summary_type">Resumo de Alertas por Tipo</string>
 
     <!-- Alertas -->
     <string name="alert">Alerta!</string>
@@ -113,6 +116,7 @@
     <string name="success">Sucesso</string>
     <string name="delete">Eliminar</string>
     <string name="edit">Editar</string>
+    <string name="create">Criar</string>
     <string name="close">Fechar</string>
     <string name="settings">Definições</string>
     <string name="status">Estado</string>
@@ -120,4 +124,6 @@
     <string name="inactive">Inativo</string>
     <string name="date">Data</string>
     <string name="location">Localização</string>
+    <string name="welcome_user">Bem-vindo, %1$s</string>
+    <string name="alerts_count">%1$d alertas</string>
 </resources>
