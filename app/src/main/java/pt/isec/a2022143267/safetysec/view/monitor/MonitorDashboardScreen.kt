@@ -15,6 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import pt.isec.a2022143267.safetysec.R
 import pt.isec.a2022143267.safetysec.navigation.Screen
+import pt.isec.a2022143267.safetysec.viewmodel.AlertStats
 import pt.isec.a2022143267.safetysec.viewmodel.AuthViewModel
 import pt.isec.a2022143267.safetysec.viewmodel.MonitorViewModel
 
@@ -30,6 +31,7 @@ fun MonitorDashboardScreen(
     val activeAlerts by monitorViewModel.activeAlerts.collectAsState()
     val alerts by monitorViewModel.alerts.collectAsState()
     val operationState by monitorViewModel.operationState.collectAsState()
+    val alertStats by monitorViewModel.alertStats.collectAsState()
 
     var showAddDialog by remember { mutableStateOf(false) }
     var otpInput by remember { mutableStateOf("") }
@@ -213,6 +215,18 @@ fun MonitorDashboardScreen(
                     })
                 }
             }
+
+            item {
+                Text(
+                    text = "Estatísticas de Segurança",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+
+            item {
+                StatisticsSection(stats = alertStats)
+            }
         }
     }
 
@@ -301,6 +315,45 @@ fun MonitorDashboardScreen(
             if (operationState is pt.isec.a2022143267.safetysec.viewmodel.OperationState.Success) {
                 otpInput = ""
                 showAddDialog = false
+            }
+        }
+    }
+}
+
+@Composable
+fun StatisticsSection(stats: List<AlertStats>) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Resumo de Alertas por Tipo",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            if (stats.isEmpty()) {
+                Text("Sem dados históricos suficientes.", style = MaterialTheme.typography.bodySmall)
+            }
+
+            stats.forEach { stat ->
+                Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = stat.type.name.replace("_", " "), style = MaterialTheme.typography.labelMedium)
+                        Text(text = "${stat.count} alertas", style = MaterialTheme.typography.labelSmall)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    LinearProgressIndicator(
+                        progress = { stat.percentage },
+                        modifier = Modifier.fillMaxWidth().height(8.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.outlineVariant,
+                    )
+                }
             }
         }
     }

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import pt.isec.a2022143267.safetysec.model.Alert
 import pt.isec.a2022143267.safetysec.model.Rule
+import pt.isec.a2022143267.safetysec.model.RuleType
 import pt.isec.a2022143267.safetysec.model.User
 import pt.isec.a2022143267.safetysec.repository.AlertRepository
 import pt.isec.a2022143267.safetysec.repository.RuleRepository
@@ -35,6 +36,9 @@ class MonitorViewModel : ViewModel() {
 
     private val _operationState = MutableStateFlow<OperationState>(OperationState.Idle)
     val operationState: StateFlow<OperationState> = _operationState.asStateFlow()
+
+    private val _alertStats = MutableStateFlow<List<AlertStats>>(emptyList())
+    val alertStats: StateFlow<List<AlertStats>> = _alertStats.asStateFlow()
 
     fun loadProtectedUsers(monitorId: String) {
         viewModelScope.launch {
@@ -80,6 +84,7 @@ class MonitorViewModel : ViewModel() {
         viewModelScope.launch {
             alertRepository.getAlertsForMonitor(monitorId).collect { alerts ->
                 _alerts.value = alerts
+                calculateStats()
             }
         }
     }
@@ -90,6 +95,25 @@ class MonitorViewModel : ViewModel() {
                 _activeAlerts.value = alerts
             }
         }
+    }
+
+    fun calculateStats() {
+        val currentAlerts = _alerts.value
+        if (currentAlerts.isEmpty()) return
+
+        val total = currentAlerts.size
+        val stats = currentAlerts
+            .groupBy { it.alertType }
+            .map { (type, list) ->
+                AlertStats(
+                    type = type,
+                    count = list.size,
+                    percentage = list.size.toFloat() / total
+                )
+            }
+            .sortedByDescending { it.count }
+
+        _alertStats.value = stats
     }
 
     fun addProtectedUserWithOTP(monitorId: String, otp: String) {
@@ -156,6 +180,12 @@ class MonitorViewModel : ViewModel() {
         _operationState.value = OperationState.Idle
     }
 }
+
+data class AlertStats(
+    val type: RuleType,
+    val count: Int,
+    val percentage: Float
+)
 
 sealed class OperationState {
     object Idle : OperationState()
