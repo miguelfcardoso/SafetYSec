@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import pt.isec.a2022143267.safetysec.R
 import pt.isec.a2022143267.safetysec.model.Rule
 import pt.isec.a2022143267.safetysec.model.RuleParameters
 import pt.isec.a2022143267.safetysec.model.RuleType
@@ -21,7 +23,7 @@ fun EditRuleParametersDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Edit Rule Parameters") },
+        title = { Text(stringResource(R.string.edit_rule_parameters)) },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -30,20 +32,20 @@ fun EditRuleParametersDialog(
                 when (rule.ruleType) {
                     RuleType.SPEED_CONTROL -> {
                         Text(
-                            text = "Speed Control Settings",
+                            text = stringResource(R.string.speed_control_settings),
                             style = MaterialTheme.typography.titleMedium
                         )
 
                         OutlinedTextField(
                             value = maxSpeed,
                             onValueChange = { maxSpeed = it },
-                            label = { Text("Max Speed (km/h)") },
+                            label = { Text(stringResource(R.string.max_speed)) },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true
                         )
 
                         Text(
-                            text = "Alert will trigger if speed exceeds this value",
+                            text = stringResource(R.string.speed_exceeds_alert),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -51,26 +53,26 @@ fun EditRuleParametersDialog(
 
                     RuleType.GEOFENCING -> {
                         Text(
-                            text = "Geofencing Settings",
+                            text = stringResource(R.string.geofencing_settings),
                             style = MaterialTheme.typography.titleMedium
                         )
 
                         OutlinedTextField(
                             value = radius,
                             onValueChange = { radius = it },
-                            label = { Text("Radius (meters)") },
+                            label = { Text(stringResource(R.string.radius)) },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true
                         )
 
                         Text(
-                            text = "Alert will trigger if user leaves this area",
+                            text = stringResource(R.string.left_area_alert),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         Text(
-                            text = "Note: Location must be set on the protected user's device",
+                            text = stringResource(R.string.set_location_note),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -78,27 +80,27 @@ fun EditRuleParametersDialog(
 
                     RuleType.INACTIVITY -> {
                         Text(
-                            text = "Inactivity Settings",
+                            text = stringResource(R.string.inactivity_settings),
                             style = MaterialTheme.typography.titleMedium
                         )
 
                         OutlinedTextField(
                             value = inactivityMinutes,
                             onValueChange = { inactivityMinutes = it },
-                            label = { Text("Inactivity Duration (minutes)") },
+                            label = { Text(stringResource(R.string.inactivity_time)) },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true
                         )
 
                         Text(
-                            text = "Alert will trigger after this period of no movement",
+                            text = stringResource(R.string.inactivity_alert),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
 
                     else -> {
-                        Text("This rule type has no configurable parameters")
+                        Text(stringResource(R.string.no_parameters))
                     }
                 }
             }
@@ -136,12 +138,12 @@ fun EditRuleParametersDialog(
                     onSave(newParameters)
                 }
             ) {
-                Text("Save")
+                Text(stringResource(R.string.save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

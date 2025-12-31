@@ -7,9 +7,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import pt.isec.a2022143267.safetysec.R
 import pt.isec.a2022143267.safetysec.navigation.Screen
 import pt.isec.a2022143267.safetysec.viewmodel.AuthState
 import pt.isec.a2022143267.safetysec.viewmodel.AuthViewModel
@@ -41,9 +43,9 @@ fun MFAScreen(navController: NavController, authViewModel: AuthViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Verificação de Segurança", style = MaterialTheme.typography.headlineMedium)
+        Text(stringResource(R.string.security_check), style = MaterialTheme.typography.headlineMedium)
         Text(
-            "Insira o código de 6 dígitos para continuar.",
+            stringResource(R.string.enter_mfa_code),
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
@@ -55,13 +57,13 @@ fun MFAScreen(navController: NavController, authViewModel: AuthViewModel) {
                     isError = false
                 }
             },
-            label = { Text("Código MFA") },
+            label = { Text(stringResource(R.string.mfa_code)) },
             isError = isError,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth(),
             supportingText = {
                 if (isError) {
-                    Text("Código incorreto. Tente novamente.", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.wrong_mfa), color = MaterialTheme.colorScheme.error)
                 }
             }
         )
@@ -80,7 +82,7 @@ fun MFAScreen(navController: NavController, authViewModel: AuthViewModel) {
                 .padding(top = 16.dp),
             enabled = code.length == 6
         ) {
-            Text("Verificar")
+            Text(stringResource(R.string.check))
         }
     }
 }

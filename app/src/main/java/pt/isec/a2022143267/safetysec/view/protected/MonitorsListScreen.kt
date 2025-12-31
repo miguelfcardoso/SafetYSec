@@ -41,10 +41,10 @@ fun MonitorsListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("My Monitors") },
+                title = { Text(stringResource(R.string.my_monitors)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -67,13 +67,13 @@ fun MonitorsListScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "No monitors connected",
+                        text = stringResource(R.string.no_monitors_connected),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.outline
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Generate an OTP to connect with a monitor",
+                        text = stringResource(R.string.generate_an_otp),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline
                     )
@@ -164,16 +164,16 @@ fun MonitorCard(
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                     Text(
-                        text = "Monitor Information",
+                        text = stringResource(R.string.monitor_information),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    InfoRow(label = "Name", value = monitor.name)
-                    InfoRow(label = "Email", value = monitor.email)
-                    InfoRow(label = "User Type", value = "Monitor")
+                    InfoRow(label = stringResource(R.string.name), value = monitor.name)
+                    InfoRow(label = stringResource(R.string.email), value = monitor.email)
+                    InfoRow(label = stringResource(R.string.user_type), value = stringResource(R.string.monitor))
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -190,7 +190,7 @@ fun MonitorCard(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Remove Monitor")
+                        Text(stringResource(R.string.remove_monitor))
                     }
                 }
             }
@@ -207,9 +207,9 @@ fun MonitorCard(
                     tint = MaterialTheme.colorScheme.error
                 )
             },
-            title = { Text("Remove Monitor") },
+            title = { Text(stringResource(R.string.remove_monitor)) },
             text = {
-                Text("Are you sure you want to remove ${monitor.name} as your monitor? This will disable all monitoring rules associated with this monitor.")
+                Text(stringResource(R.string.are_you_sure_remove_monitor, monitor.name))
             },
             confirmButton = {
                 TextButton(
@@ -221,12 +221,12 @@ fun MonitorCard(
                         contentColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text("Remove")
+                    Text(stringResource(R.string.remove))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showRemoveDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

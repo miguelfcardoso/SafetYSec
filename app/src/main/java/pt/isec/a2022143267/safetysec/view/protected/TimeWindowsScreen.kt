@@ -47,7 +47,7 @@ fun TimeWindowsScreen(
                 title = { Text(stringResource(R.string.time_windows)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -75,13 +75,13 @@ fun TimeWindowsScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "No time windows configured",
+                        text = stringResource(R.string.no_time_windows_configured),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.outline
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Create time windows to control when monitoring is active",
+                        text = stringResource(R.string.create_time_windows_note),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline
                     )
@@ -187,7 +187,7 @@ fun TimeWindowCard(
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                     Text(
-                        text = "Active Days:",
+                        text = stringResource(R.string.active_days),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -198,7 +198,13 @@ fun TimeWindowCard(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        val dayNames = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+                        val dayNames = listOf(stringResource(R.string.mon),
+                            stringResource(R.string.tue),
+                            stringResource(R.string.wed),
+                            stringResource(R.string.thu),
+                            stringResource(R.string.fri),
+                            stringResource(R.string.sat),
+                            stringResource(R.string.sun))
                         dayNames.forEachIndexed { index, dayName ->
                             val isActive = timeWindow.daysOfWeek.contains(index + 1)
                             FilterChip(
@@ -228,7 +234,7 @@ fun TimeWindowCard(
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Delete")
+                            Text(stringResource(R.string.delete))
                         }
                     }
                 }
@@ -239,8 +245,8 @@ fun TimeWindowCard(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Time Window") },
-            text = { Text("Are you sure you want to delete '${timeWindow.name}'?") },
+            title = { Text(stringResource(R.string.delete_time_window)) },
+            text = { Text(stringResource(R.string.delete_time_window_confirmation, timeWindow.name)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -251,12 +257,12 @@ fun TimeWindowCard(
                         contentColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -288,7 +294,7 @@ fun CreateTimeWindowDialog(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Name") },
+                    label = { Text(stringResource(R.string.name)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -310,7 +316,7 @@ fun CreateTimeWindowDialog(
                                 if (hour in 0..23) startHour = hour
                             }
                         },
-                        label = { Text("Hour") },
+                        label = { Text(stringResource(R.string.hour)) },
                         modifier = Modifier.weight(1f)
                     )
                     OutlinedTextField(
@@ -320,7 +326,7 @@ fun CreateTimeWindowDialog(
                                 if (minute in 0..59) startMinute = minute
                             }
                         },
-                        label = { Text("Min") },
+                        label = { Text(stringResource(R.string.min)) },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -342,7 +348,7 @@ fun CreateTimeWindowDialog(
                                 if (hour in 0..23) endHour = hour
                             }
                         },
-                        label = { Text("Hour") },
+                        label = { Text(stringResource(R.string.hour)) },
                         modifier = Modifier.weight(1f)
                     )
                     OutlinedTextField(
@@ -352,7 +358,7 @@ fun CreateTimeWindowDialog(
                                 if (minute in 0..59) endMinute = minute
                             }
                         },
-                        label = { Text("Min") },
+                        label = { Text(stringResource(R.string.min)) },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -366,7 +372,13 @@ fun CreateTimeWindowDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                val dayNames = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+                val dayNames = listOf(stringResource(R.string.mon),
+                    stringResource(R.string.tue),
+                    stringResource(R.string.wed),
+                    stringResource(R.string.thu),
+                    stringResource(R.string.fri),
+                    stringResource(R.string.sat),
+                    stringResource(R.string.sun))
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     dayNames.chunked(4).forEach { chunk ->
                         Row(

@@ -75,7 +75,7 @@ fun MonitorDashboardScreen(
                     IconButton(onClick = {
                         navController.navigate(Screen.MonitorSettings.route)
                     }) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
                     }
                     IconButton(onClick = {
                         authViewModel.logout()
@@ -203,7 +203,7 @@ fun MonitorDashboardScreen(
             if (activeAlerts.isEmpty()) {
                 item {
                     Text(
-                        text = "No active alerts",
+                        text = stringResource(R.string.no_active_alerts),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(16.dp)
                     )
@@ -262,7 +262,7 @@ fun MonitorDashboardScreen(
                         value = otpInput,
                         onValueChange = { otpInput = it },
                         label = { Text(stringResource(R.string.one_time_password)) },
-                        placeholder = { Text("Enter 6-digit code") },
+                        placeholder = { Text(stringResource(R.string.enter_otp)) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         enabled = operationState !is pt.isec.a2022143267.safetysec.viewmodel.OperationState.Loading
@@ -277,7 +277,7 @@ fun MonitorDashboardScreen(
                         ) {
                             CircularProgressIndicator(modifier = Modifier.size(24.dp))
                             Spacer(modifier = Modifier.width(16.dp))
-                            Text("Verifying OTP...")
+                            Text(stringResource(R.string.verifying_otp))
                         }
                     }
                 }
@@ -335,18 +335,20 @@ fun getTranslatedRuleType(type: pt.isec.a2022143267.safetysec.model.RuleType): S
 @Composable
 fun StatisticsSection(stats: List<AlertStats>) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Resumo de Alertas por Tipo",
+                text = stringResource(R.string.alert_type_summary),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
             if (stats.isEmpty()) {
-                Text("Sem dados históricos suficientes.", style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.no_data), style = MaterialTheme.typography.bodySmall)
             }
 
             stats.forEach { stat ->
@@ -356,12 +358,14 @@ fun StatisticsSection(stats: List<AlertStats>) {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(text = getTranslatedRuleType(stat.type), style = MaterialTheme.typography.labelMedium)
-                        Text(text = "${stat.count} alertas", style = MaterialTheme.typography.labelSmall)
+                        Text(text = stringResource(R.string.alerts_count, stat.count), style = MaterialTheme.typography.labelSmall)
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     LinearProgressIndicator(
                         progress = { stat.percentage },
-                        modifier = Modifier.fillMaxWidth().height(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp),
                         color = MaterialTheme.colorScheme.primary,
                         trackColor = MaterialTheme.colorScheme.outlineVariant,
                     )
@@ -430,7 +434,7 @@ fun AlertCard(
                     color = MaterialTheme.colorScheme.onErrorContainer
                 )
                 Text(
-                    text = "Status: ${alert.status.name}",
+                    text = stringResource(R.string.status_label, alert.status.name),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onErrorContainer
                 )

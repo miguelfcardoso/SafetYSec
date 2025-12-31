@@ -36,6 +36,8 @@ fun ProtectedDashboardScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val panicAlertMessage = stringResource(R.string.panic_alert_sent)
+
     var showOTPDialog by remember { mutableStateOf(false) }
 
     // Show alert feedback
@@ -43,7 +45,7 @@ fun ProtectedDashboardScreen(
         when (alertState) {
             is pt.isec.a2022143267.safetysec.viewmodel.AlertOperationState.Countdown -> {
                 snackbarHostState.showSnackbar(
-                    message = "Panic alert sent! You have 10 seconds to cancel.",
+                    message = panicAlertMessage,
                     duration = SnackbarDuration.Short
                 )
             }
@@ -75,7 +77,7 @@ fun ProtectedDashboardScreen(
                         Icon(Icons.Default.Lock, contentDescription = stringResource(R.string.generate_otp))
                     }
                     IconButton(onClick = { navController.navigate(Screen.Settings.route) }) {
-                        Icon(Icons.Default.Settings, contentDescription = "Definições")
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
                     }
                     IconButton(onClick = {
                         authViewModel.logout()
@@ -140,7 +142,7 @@ fun ProtectedDashboardScreen(
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = "Use this code to cancel alerts",
+                            text = stringResource(R.string.use_this_cancel_code),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -175,7 +177,7 @@ fun ProtectedDashboardScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "Share with monitors to connect",
+                                    text = stringResource(R.string.share_with_monitors_to_connect),
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
@@ -188,7 +190,7 @@ fun ProtectedDashboardScreen(
                                     modifier = Modifier.size(20.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Generate")
+                                Text(stringResource(R.string.generate_otp))
                             }
                         }
                     }
@@ -199,7 +201,7 @@ fun ProtectedDashboardScreen(
             // Quick Access Cards
             item {
                 Text(
-                    text = "Quick Access",
+                    text = stringResource(R.string.quick_access),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
@@ -211,13 +213,13 @@ fun ProtectedDashboardScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     QuickAccessCard(
-                        title = "Time Windows",
+                        title = stringResource(R.string.time_windows),
                         icon = Icons.Default.DateRange,
                         onClick = { navController.navigate(Screen.ProtectedTimeWindows.route) },
                         modifier = Modifier.weight(1f)
                     )
                     QuickAccessCard(
-                        title = "My Monitors",
+                        title = stringResource(R.string.my_monitors),
                         icon = Icons.Default.Person,
                         onClick = { navController.navigate(Screen.ProtectedMonitors.route) },
                         modifier = Modifier.weight(1f)
@@ -232,13 +234,13 @@ fun ProtectedDashboardScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     QuickAccessCard(
-                        title = "Active Rules",
+                        title = stringResource(R.string.active_rules),
                         icon = Icons.Default.Settings,
                         onClick = { navController.navigate(Screen.ProtectedRules.route) },
                         modifier = Modifier.weight(1f)
                     )
                     QuickAccessCard(
-                        title = "History",
+                        title = stringResource(R.string.history),
                         icon = Icons.Default.Info,
                         onClick = { navController.navigate(Screen.ProtectedHistory.route) },
                         modifier = Modifier.weight(1f)
@@ -269,11 +271,11 @@ fun ProtectedDashboardScreen(
                                 .padding(16.dp)
                         ) {
                             Text(
-                                text = "Monitor Request",
+                                text = stringResource(R.string.monitor_request),
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Text(
-                                text = "Monitor ID: ${relation.monitorId}",
+                                text = stringResource(R.string.monitor_id, relation.monitorId),
                                 style = MaterialTheme.typography.bodySmall
                             )
                             Spacer(modifier = Modifier.height(8.dp))
@@ -305,7 +307,7 @@ fun ProtectedDashboardScreen(
             // Monitors section
             item {
                 Text(
-                    text = "My Monitors",
+                    text = stringResource(R.string.my_monitors),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
@@ -314,7 +316,7 @@ fun ProtectedDashboardScreen(
             if (monitors.isEmpty()) {
                 item {
                     Text(
-                        text = "No monitors assigned",
+                        text = stringResource(R.string.no_monitors_assigned),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(16.dp)
                     )
@@ -369,7 +371,7 @@ fun ProtectedDashboardScreen(
             if (rules.isEmpty()) {
                 item {
                     Text(
-                        text = "No rules configured",
+                        text = stringResource(R.string.no_rules_configured),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(16.dp)
                     )
@@ -450,7 +452,7 @@ fun ProtectedDashboardScreen(
                 ) {
                     if (generatedOTP != null) {
                         Text(
-                            text = "Your OTP code is:",
+                            text = stringResource(R.string.otp_code),
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Spacer(modifier = Modifier.height(16.dp))
@@ -468,13 +470,13 @@ fun ProtectedDashboardScreen(
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "📱 Share this code with your monitor",
+                            text = stringResource(R.string.share_code_with_monitor),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "⚠️ This code expires after use",
+                            text = stringResource(R.string.code_expires_after_use),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -487,13 +489,13 @@ fun ProtectedDashboardScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Generate a one-time password to share with your monitor",
+                            text = stringResource(R.string.generate_one_time_password_to_share),
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "This code will allow a monitor to send you connection request",
+                            text = stringResource(R.string.connection_request_code),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center

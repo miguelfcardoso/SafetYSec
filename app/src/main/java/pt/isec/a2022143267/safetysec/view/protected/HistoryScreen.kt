@@ -79,12 +79,12 @@ fun HistoryScreen(
                 title = { Text(stringResource(R.string.history)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
                     IconButton(onClick = { showFilterDialog = true }) {
-                        Icon(Icons.Default.Settings, contentDescription = "Filter")
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.filter))
                     }
                 }
             )
@@ -107,7 +107,7 @@ fun HistoryScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "No alerts in history",
+                        text = stringResource(R.string.no_alerts_in_history),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.outline
                     )
@@ -125,9 +125,9 @@ fun HistoryScreen(
                         FilterChip(
                             selected = true,
                             onClick = { selectedFilter = null },
-                            label = { Text("Filter: ${selectedFilter?.name}") },
+                            label = {Text(text = stringResource(R.string.filter_var, selectedFilter?.name ?: stringResource(R.string.all))) },
                             trailingIcon = {
-                                Icon(Icons.Default.Close, contentDescription = "Clear filter")
+                                Icon(Icons.Default.Close, contentDescription = stringResource(R.string.clear_filter))
                             }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -155,7 +155,7 @@ fun HistoryScreen(
     if (showFilterDialog) {
         AlertDialog(
             onDismissRequest = { showFilterDialog = false },
-            title = { Text("Filter by type") },
+            title = { Text(stringResource(R.string.filter_by_type)) },
             text = {
                 Column {
                     RuleType.values().forEach { type ->
@@ -175,7 +175,7 @@ fun HistoryScreen(
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(modifier = Modifier.width(16.dp))
-                            Text(type.name)
+                            Text(getTranslatedRuleName(type))
                         }
                     }
 
@@ -197,7 +197,7 @@ fun HistoryScreen(
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(16.dp))
-                        Text("Show All")
+                        Text(stringResource(R.string.show_all))
                     }
                 }
             },
@@ -227,7 +227,7 @@ fun HistoryScreen(
                 )
             },
             title = {
-                Text(alert.alertType.name.replace("_", " "))
+                Text(text = getTranslatedRuleName(alert.alertType))
             },
             text = {
                 Column(
@@ -240,7 +240,7 @@ fun HistoryScreen(
                             .padding(vertical = 4.dp)
                     ) {
                         Text(
-                            text = "Date & Time:",
+                            text = stringResource(R.string.date_time),
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.width(120.dp)
                         )
@@ -257,12 +257,12 @@ fun HistoryScreen(
                             .padding(vertical = 4.dp)
                     ) {
                         Text(
-                            text = "Status:",
+                            text = stringResource(R.string.status_dp),
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.width(120.dp)
                         )
                         Text(
-                            text = alert.status.name,
+                            text = getTranslatedStatus(alert.status),
                             style = MaterialTheme.typography.bodyMedium,
                             color = when (alert.status) {
                                 AlertStatus.ACTIVE -> MaterialTheme.colorScheme.error
@@ -277,7 +277,7 @@ fun HistoryScreen(
                     alert.location?.let { location ->
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         Text(
-                            text = "Location:",
+                            text = stringResource(R.string.location_dp),
                             style = MaterialTheme.typography.labelMedium
                         )
                         Row(
@@ -286,7 +286,7 @@ fun HistoryScreen(
                                 .padding(vertical = 4.dp)
                         ) {
                             Text(
-                                text = "Latitude:",
+                                text = stringResource(R.string.latitude_dp),
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.width(120.dp)
                             )
@@ -301,7 +301,7 @@ fun HistoryScreen(
                                 .padding(vertical = 4.dp)
                         ) {
                             Text(
-                                text = "Longitude:",
+                                text = stringResource(R.string.longitude_dp),
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.width(120.dp)
                             )
@@ -316,7 +316,7 @@ fun HistoryScreen(
                     if (alert.additionalData.isNotEmpty()) {
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         Text(
-                            text = "Additional Information:",
+                            text = stringResource(R.string.additional_information),
                             style = MaterialTheme.typography.labelMedium
                         )
                         alert.additionalData.forEach { (key, value) ->
@@ -355,7 +355,7 @@ fun HistoryScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Video recording available",
+                                text = stringResource(R.string.video_recording_available),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -366,13 +366,13 @@ fun HistoryScreen(
                     if (alert.status == AlertStatus.CANCELLED && alert.cancelledBy.isNotEmpty()) {
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         Text(
-                            text = "Cancelled by user",
+                            text = stringResource(R.string.cancelled_by_user),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.outline
                         )
                         alert.cancelledAt?.let {
                             Text(
-                                text = "at ${DateTimeUtils.formatDateTime(it)}",
+                                text = stringResource(R.string.at, DateTimeUtils.formatDateTime(it)),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.outline
                             )
@@ -398,7 +398,7 @@ fun HistoryScreen(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Delete")
+                        Text(stringResource(R.string.delete))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(onClick = { selectedAlert = null }) {
@@ -427,7 +427,7 @@ fun HistoryScreen(
                 )
             },
             title = {
-                Text(if (isActiveAlert) "Delete Active Alert?" else "Delete Alert")
+                Text(if (isActiveAlert) stringResource(R.string.delete_active_alert) else stringResource(R.string.delete_alert))
             },
             text = {
                 Column {
@@ -449,7 +449,7 @@ fun HistoryScreen(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "This appears to be an old test alert from early development.",
+                                    text = stringResource(R.string.old_test_alert),
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
@@ -459,19 +459,19 @@ fun HistoryScreen(
 
                     if (isActiveAlert) {
                         Text(
-                            text = "⚠️ This alert has ACTIVE status",
+                            text = stringResource(R.string.this_alert_has_active_status),
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.error
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Deleting an active alert will permanently remove it from the database.",
+                            text = stringResource(R.string.delete_alert_permanently),
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                     Text(
-                        text = "Are you sure you want to delete this alert? This action cannot be undone.",
+                        text = stringResource(R.string.delete_alert_confirmation),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -489,7 +489,7 @@ fun HistoryScreen(
                         containerColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text(if (isActiveAlert) "Delete Anyway" else "Delete")
+                    Text(if (isActiveAlert) stringResource(R.string.delete_anyway) else stringResource(R.string.delete))
                 }
             },
             dismissButton = {
@@ -547,7 +547,7 @@ fun AlertHistoryCard(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = alert.alertType.name.replace("_", " "),
+                    text = getTranslatedRuleName(alert.alertType),
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -557,7 +557,7 @@ fun AlertHistoryCard(
                 )
 
                 Text(
-                    text = "Status: ${alert.status.name}",
+                    text = stringResource(R.string.status_var, getTranslatedStatus(alert.status)),
                     style = MaterialTheme.typography.bodySmall,
                     color = when (alert.status) {
                         AlertStatus.ACTIVE -> MaterialTheme.colorScheme.error
@@ -587,10 +587,20 @@ fun AlertHistoryCard(
             ) {
                 Icon(
                     Icons.Default.Delete,
-                    contentDescription = "Delete alert"
+                    contentDescription = stringResource(R.string.delete_alert)
                 )
             }
         }
+    }
+}
+
+@Composable
+fun getTranslatedStatus(status: AlertStatus): String {
+    return when (status) {
+        AlertStatus.ACTIVE -> stringResource(R.string.active)
+        AlertStatus.RESOLVED -> stringResource(R.string.resolved)
+        AlertStatus.CANCELLED -> stringResource(R.string.cancelled)
+        else -> status.name
     }
 }
 

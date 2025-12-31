@@ -54,7 +54,7 @@ fun ProtectedRulesScreen(
                 title = { Text(stringResource(R.string.monitoring_rules)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -78,12 +78,11 @@ fun ProtectedRulesScreen(
                         FilterChip(
                             selected = selectedFilter == null,
                             onClick = { selectedFilter = null },
-                            label = { Text("All") }
+                            label = { Text(stringResource(R.string.all)) }
                         )
                     }
 
-                    items(monitors.size) { index ->
-                        val monitor = monitors[index]
+                    items(monitors) { monitor ->
                         FilterChip(
                             selected = selectedFilter == monitor.id,
                             onClick = { selectedFilter = monitor.id },
@@ -107,7 +106,7 @@ fun ProtectedRulesScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "No rules configured",
+                            text = stringResource(R.string.no_rules_configured),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.outline
                         )
@@ -122,7 +121,7 @@ fun ProtectedRulesScreen(
                     items(filteredRules) { rule ->
                         RuleCard(
                             rule = rule,
-                            monitorName = monitors.find { it.id == rule.monitorId }?.name ?: "Unknown",
+                            monitorName = monitors.find { it.id == rule.monitorId }?.name ?: stringResource(R.string.unknown),
                             onToggleEnabled = { enabled ->
                                 protectedViewModel.updateRuleStatus(rule.id, enabled)
                             },
@@ -180,11 +179,11 @@ fun RuleCard(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = rule.ruleType.name.replace("_", " "),
+                        text = getTranslatedRuleName(rule.ruleType),
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        text = "By: $monitorName",
+                        text = stringResource(R.string.by_monitor, monitorName),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -210,7 +209,7 @@ fun RuleCard(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Parameters:",
+                    text = stringResource(R.string.parameters),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -225,7 +224,7 @@ fun RuleCard(
                                         .padding(vertical = 2.dp)
                                 ) {
                                     Text(
-                                        text = "Location:",
+                                        text = stringResource(R.string.location_dp),
                                         style = MaterialTheme.typography.bodySmall,
                                         modifier = Modifier.width(120.dp),
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -241,7 +240,7 @@ fun RuleCard(
                                         .padding(vertical = 2.dp)
                                 ) {
                                     Text(
-                                        text = "Radius:",
+                                        text = stringResource(R.string.radius_dp),
                                         style = MaterialTheme.typography.bodySmall,
                                         modifier = Modifier.width(120.dp),
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -260,7 +259,7 @@ fun RuleCard(
                                     .padding(vertical = 2.dp)
                             ) {
                                 Text(
-                                    text = "Max Speed:",
+                                    text = stringResource(R.string.max_speed_dp),
                                     style = MaterialTheme.typography.bodySmall,
                                     modifier = Modifier.width(120.dp),
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -278,13 +277,13 @@ fun RuleCard(
                                     .padding(vertical = 2.dp)
                             ) {
                                 Text(
-                                    text = "Inactivity Time:",
+                                    text = stringResource(R.string.inactivity_time_dp),
                                     style = MaterialTheme.typography.bodySmall,
                                     modifier = Modifier.width(120.dp),
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(
-                                    text = "${rule.parameters.inactivityMinutes} minutes",
+                                    text = "${rule.parameters.inactivityMinutes} min",
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
@@ -309,7 +308,7 @@ fun RuleCard(
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Revoke Rule")
+                Text(stringResource(R.string.revoke_rule))
             }
         }
     }
@@ -324,9 +323,13 @@ fun RuleCard(
                     tint = MaterialTheme.colorScheme.error
                 )
             },
-            title = { Text("Revoke Rule") },
+            title = { Text(stringResource(R.string.revoke_rule)) },
             text = {
-                Text("Are you sure you want to revoke this ${rule.ruleType.name.replace("_", " ")} rule? This action cannot be undone and the monitor will need to create a new rule.")
+                Text(
+                    stringResource(
+                        R.string.revoke_rule_confirmation,
+                        getTranslatedRuleName(rule.ruleType)
+                    ))
             },
             confirmButton = {
                 TextButton(
@@ -338,15 +341,27 @@ fun RuleCard(
                         contentColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text("Revoke")
+                    Text(stringResource(R.string.revoke))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showRevokeDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
+    }
+}
+
+@Composable
+fun getTranslatedRuleName(ruleType: RuleType): String {
+    return when (ruleType) {
+        RuleType.FALL_DETECTION -> stringResource(R.string.fall_detection)
+        RuleType.GEOFENCING -> stringResource(R.string.geofencing)
+        RuleType.SPEED_CONTROL -> stringResource(R.string.speed_control)
+        RuleType.INACTIVITY -> stringResource(R.string.inactivity)
+        RuleType.ACCIDENT -> stringResource(R.string.accident)
+        RuleType.PANIC_BUTTON -> stringResource(R.string.panic_button)
     }
 }
 
