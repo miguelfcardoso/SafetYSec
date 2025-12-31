@@ -92,7 +92,7 @@ fun MonitorSettingsScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -141,7 +141,7 @@ fun MonitorSettingsScreen(
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
                         Text(
-                            text = currentUser?.name ?: "Monitor",
+                            text = currentUser?.name ?: stringResource(R.string.monitor),
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -153,7 +153,7 @@ fun MonitorSettingsScreen(
                         Spacer(modifier = Modifier.height(4.dp))
                         AssistChip(
                             onClick = { },
-                            label = { Text("Monitor") },
+                            label = { Text(stringResource(R.string.monitor)) },
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.CheckCircle,
@@ -190,7 +190,7 @@ fun MonitorSettingsScreen(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                "Personal Information",
+                                stringResource(R.string.personal_information),
                                 style = MaterialTheme.typography.titleMedium
                             )
                         }
@@ -210,7 +210,7 @@ fun MonitorSettingsScreen(
                             OutlinedTextField(
                                 value = nameText,
                                 onValueChange = { nameText = it },
-                                label = { Text("Name") },
+                                label = { Text(stringResource(R.string.name)) },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                                 leadingIcon = {
@@ -242,7 +242,7 @@ fun MonitorSettingsScreen(
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                 }
-                                Text("Update Name")
+                                Text(stringResource(R.string.update_name))
                             }
                         }
                     }
@@ -268,7 +268,7 @@ fun MonitorSettingsScreen(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                "Change Password",
+                                stringResource(R.string.change_password),
                                 style = MaterialTheme.typography.titleMedium
                             )
                         }
@@ -288,7 +288,7 @@ fun MonitorSettingsScreen(
                             OutlinedTextField(
                                 value = newPassword,
                                 onValueChange = { newPassword = it },
-                                label = { Text("New Password") },
+                                label = { Text(stringResource(R.string.new_password)) },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                                 visualTransformation = if (showPassword)
@@ -319,7 +319,7 @@ fun MonitorSettingsScreen(
                             OutlinedTextField(
                                 value = confirmPassword,
                                 onValueChange = { confirmPassword = it },
-                                label = { Text("Confirm Password") },
+                                label = { Text(stringResource(R.string.confirm_password)) },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                                 visualTransformation = if (showConfirmPassword)
@@ -348,7 +348,7 @@ fun MonitorSettingsScreen(
 
                             if (confirmPassword.isNotEmpty() && newPassword != confirmPassword) {
                                 Text(
-                                    text = "Passwords do not match",
+                                    text = stringResource(R.string.passwords_dont_match),
                                     color = MaterialTheme.colorScheme.error,
                                     style = MaterialTheme.typography.bodySmall,
                                     modifier = Modifier.padding(start = 16.dp, top = 4.dp)
@@ -378,12 +378,12 @@ fun MonitorSettingsScreen(
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                 }
-                                Text("Change Password")
+                                Text(stringResource(R.string.change_password))
                             }
 
                             if (newPassword.isNotEmpty() && newPassword.length < 6) {
                                 Text(
-                                    text = "Password must be at least 6 characters",
+                                    text = stringResource(R.string.password_must_have_6),
                                     color = MaterialTheme.colorScheme.error,
                                     style = MaterialTheme.typography.bodySmall,
                                     modifier = Modifier.padding(start = 16.dp, top = 8.dp)
@@ -424,7 +424,7 @@ fun MonitorSettingsScreen(
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Logout")
+                    Text(stringResource(R.string.logout))
                 }
             }
         }

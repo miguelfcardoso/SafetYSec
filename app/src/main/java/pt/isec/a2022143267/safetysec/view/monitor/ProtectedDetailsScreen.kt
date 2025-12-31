@@ -70,10 +70,10 @@ fun ProtectedDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("${protectedUser.name} - Rules") },
+                title = { Text(stringResource(R.string.var_rules, protectedUser.name)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -82,7 +82,7 @@ fun ProtectedDetailsScreen(
             FloatingActionButton(
                 onClick = { showCreateRuleDialog = true }
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Create Rule")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.create_rule))
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -139,12 +139,12 @@ fun ProtectedDetailsScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     InfoCard(
-                        title = "Total Rules",
+                        title = stringResource(R.string.total_rules),
                         value = totalCount.toString(),
                         modifier = Modifier.weight(1f)
                     )
                     InfoCard(
-                        title = "Active Rules",
+                        title = stringResource(R.string.active_rules),
                         value = activeCount.toString(),
                         modifier = Modifier.weight(1f)
                     )
@@ -185,12 +185,12 @@ fun ProtectedDetailsScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "No rules configured",
+                                text = stringResource(R.string.no_rules_configured),
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Create your first monitoring rule",
+                                text = stringResource(R.string.create_your_first_rule),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -315,26 +315,26 @@ fun RuleCard(
                     when (rule.ruleType) {
                         RuleType.SPEED_CONTROL -> {
                             ParameterItem(
-                                label = "Max Speed",
+                                label = stringResource(R.string.max_speed),
                                 value = "${rule.parameters.maxSpeed} km/h"
                             )
                         }
                         RuleType.GEOFENCING -> {
                             ParameterItem(
-                                label = "Radius",
-                                value = "${rule.parameters.radius} meters"
+                                label = stringResource(R.string.radius),
+                                value = "${rule.parameters.radius} m"
                             )
                             rule.parameters.geoPoint?.let {
                                 ParameterItem(
-                                    label = "Location",
+                                    label = stringResource(R.string.location),
                                     value = "Lat: ${it.latitude}, Lng: ${it.longitude}"
                                 )
                             }
                         }
                         RuleType.INACTIVITY -> {
                             ParameterItem(
-                                label = "Inactivity Duration",
-                                value = "${rule.parameters.inactivityMinutes} minutes"
+                                label = stringResource(R.string.inactivity_duration),
+                                value = "${rule.parameters.inactivityMinutes} min"
                             )
                         }
                         else -> {}
@@ -362,7 +362,7 @@ fun RuleCard(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Edit Parameters")
+                        Text(stringResource(R.string.edit_parameters))
                     }
                 }
 
@@ -386,7 +386,7 @@ fun RuleCard(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Delete Rule")
+                    Text(stringResource(R.string.delete_rule))
                 }
             }
         }
@@ -408,8 +408,8 @@ fun RuleCard(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Rule") },
-            text = { Text("Are you sure you want to delete this rule? This action cannot be undone.") },
+            title = { Text(stringResource(R.string.delete_rule)) },
+            text = { Text(stringResource(R.string.delete_rule_confirmation)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -420,12 +420,12 @@ fun RuleCard(
                         containerColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -461,32 +461,36 @@ fun CreateRuleDialog(
     onDismiss: () -> Unit,
     onRuleCreated: () -> Unit
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text("Create Monitoring Rule")
+            Text(stringResource(R.string.create_monitoring_rule))
         },
         text = {
             LazyColumn {
                 item {
                     Text(
-                        text = "Select rule type for ${protectedUser.name}:",
+                        text = stringResource(R.string.select_rule_type, protectedUser.name),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
                 }
 
-                items(RuleType.values().toList()) { ruleType ->
+                items(RuleType.entries) { ruleType ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp),
                         onClick = {
+                            val descriptionResId = getRuleDescription(ruleType)
+                            val translatedDescription = context.getString(descriptionResId)
                             // Create rule with default parameters
                             val rule = Rule(
                                 id = "",
                                 name = ruleType.name.replace("_", " "),
-                                description = getRuleDescription(ruleType),
+                                description = translatedDescription,
                                 ruleType = ruleType,
                                 protectedId = protectedUser.id,
                                 monitorId = monitorId,
@@ -523,7 +527,7 @@ fun CreateRuleDialog(
                                     style = MaterialTheme.typography.titleSmall
                                 )
                                 Text(
-                                    text = getRuleDescription(ruleType),
+                                    text = stringResource(id = getRuleDescription(ruleType)),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -535,7 +539,7 @@ fun CreateRuleDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )
@@ -577,11 +581,10 @@ private fun getIconForRuleType(ruleType: RuleType) = when (ruleType) {
 }
 
 private fun getRuleDescription(ruleType: RuleType) = when (ruleType) {
-    RuleType.FALL_DETECTION -> "Detect falls using accelerometer"
-    RuleType.ACCIDENT -> "Detect sudden deceleration"
-    RuleType.GEOFENCING -> "Alert when outside defined area"
-    RuleType.SPEED_CONTROL -> "Alert on excessive speed"
-    RuleType.INACTIVITY -> "Detect prolonged inactivity"
-    RuleType.PANIC_BUTTON -> "Manual panic alert (always active)"
+    RuleType.FALL_DETECTION -> R.string.detect_falls_accelerometer
+    RuleType.ACCIDENT -> R.string.detect_sudden_deceleration
+    RuleType.GEOFENCING -> R.string.alert_outside_area
+    RuleType.SPEED_CONTROL -> R.string.alert_excessive_speed
+    RuleType.INACTIVITY -> R.string.detect_prolonged_inactivity
+    RuleType.PANIC_BUTTON -> R.string.manual_panic_alert
 }
-

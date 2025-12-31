@@ -87,7 +87,7 @@ fun SettingsScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -136,7 +136,7 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
                         Text(
-                            text = currentUser?.name ?: "Protected User",
+                            text = currentUser?.name ?: stringResource(R.string.protected_user_full),
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -148,7 +148,7 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.height(4.dp))
                         AssistChip(
                             onClick = { },
-                            label = { Text("Protected") },
+                            label = { Text(stringResource(R.string.protected_user)) },
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.CheckCircle,
@@ -185,7 +185,7 @@ fun SettingsScreen(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                "Personal Information",
+                                stringResource(R.string.personal_information),
                                 style = MaterialTheme.typography.titleMedium
                             )
                         }
@@ -205,7 +205,7 @@ fun SettingsScreen(
                             OutlinedTextField(
                                 value = nameText,
                                 onValueChange = { nameText = it },
-                                label = { Text("Name") },
+                                label = { Text(stringResource(R.string.name)) },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                                 leadingIcon = {
@@ -237,7 +237,7 @@ fun SettingsScreen(
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                 }
-                                Text("Update Name")
+                                Text(stringResource(R.string.update_name))
                             }
                         }
                     }
@@ -263,7 +263,7 @@ fun SettingsScreen(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                "Change Password",
+                                stringResource(R.string.change_password),
                                 style = MaterialTheme.typography.titleMedium
                             )
                         }
@@ -283,7 +283,7 @@ fun SettingsScreen(
                             OutlinedTextField(
                                 value = newPassword,
                                 onValueChange = { newPassword = it },
-                                label = { Text("New Password") },
+                                label = { Text(stringResource(R.string.new_password)) },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                                 visualTransformation = if (showPassword)
@@ -314,7 +314,7 @@ fun SettingsScreen(
                             OutlinedTextField(
                                 value = confirmPassword,
                                 onValueChange = { confirmPassword = it },
-                                label = { Text("Confirm Password") },
+                                label = { Text(stringResource(R.string.confirm_password)) },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                                 visualTransformation = if (showConfirmPassword)
@@ -343,7 +343,7 @@ fun SettingsScreen(
 
                             if (confirmPassword.isNotEmpty() && newPassword != confirmPassword) {
                                 Text(
-                                    text = "Passwords do not match",
+                                    text = stringResource(R.string.passwords_dont_match),
                                     color = MaterialTheme.colorScheme.error,
                                     style = MaterialTheme.typography.bodySmall,
                                     modifier = Modifier.padding(start = 16.dp, top = 4.dp)
@@ -373,12 +373,12 @@ fun SettingsScreen(
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                 }
-                                Text("Change Password")
+                                Text(stringResource(R.string.change_password))
                             }
 
                             if (newPassword.isNotEmpty() && newPassword.length < 6) {
                                 Text(
-                                    text = "Password must be at least 6 characters",
+                                    text = stringResource(R.string.password_must_have_6),
                                     color = MaterialTheme.colorScheme.error,
                                     style = MaterialTheme.typography.bodySmall,
                                     modifier = Modifier.padding(start = 16.dp, top = 8.dp)
@@ -409,7 +409,7 @@ fun SettingsScreen(
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(
-                                    "Alert Cancellation PIN",
+                                    stringResource(R.string.alert_cancellation_pin),
                                     style = MaterialTheme.typography.titleMedium
                                 )
                             }
@@ -427,7 +427,7 @@ fun SettingsScreen(
                         ) {
                             Column(modifier = Modifier.padding(top = 16.dp)) {
                                 Text(
-                                    text = "This PIN is used to cancel false alerts within 10 seconds",
+                                    text = stringResource(R.string.why_is_pin_used),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(bottom = 12.dp)
@@ -440,7 +440,7 @@ fun SettingsScreen(
                                             newCancelCode = it
                                         }
                                     },
-                                    label = { Text("New PIN (4 digits)") },
+                                    label = { Text(stringResource(R.string.new_pin_4)) },
                                     modifier = Modifier.fillMaxWidth(),
                                     singleLine = true,
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -473,12 +473,12 @@ fun SettingsScreen(
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                     }
-                                    Text("Update PIN")
+                                    Text(stringResource(R.string.update_pin))
                                 }
 
                                 if (newCancelCode.isNotEmpty() && newCancelCode.length < 4) {
                                     Text(
-                                        text = "PIN must be exactly 4 digits",
+                                        text = stringResource(R.string.pin_must_be_4),
                                         color = MaterialTheme.colorScheme.error,
                                         style = MaterialTheme.typography.bodySmall,
                                         modifier = Modifier.padding(start = 16.dp, top = 8.dp)
@@ -520,7 +520,7 @@ fun SettingsScreen(
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Logout")
+                    Text(stringResource(R.string.logout))
                 }
             }
         }
