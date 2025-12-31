@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import pt.isec.a2022143267.safetysec.model.Alert
+import pt.isec.a2022143267.safetysec.model.AlertStatus
 import pt.isec.a2022143267.safetysec.model.Rule
 import pt.isec.a2022143267.safetysec.model.RuleType
 import pt.isec.a2022143267.safetysec.model.User
@@ -98,7 +99,7 @@ class MonitorViewModel : ViewModel() {
     }
 
     fun calculateStats() {
-        val currentAlerts = _alerts.value
+        val currentAlerts = _alerts.value.filter { it.status != AlertStatus.CANCELLED }
         if (currentAlerts.isEmpty()) return
 
         val total = currentAlerts.size

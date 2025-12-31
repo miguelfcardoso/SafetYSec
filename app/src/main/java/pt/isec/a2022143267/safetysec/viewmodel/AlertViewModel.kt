@@ -74,10 +74,13 @@ class AlertViewModel : ViewModel() {
                 _alertState.value = AlertOperationState.Loading
                 isCancelled = false
 
-                // Create a panic alert
+                val relations = alertRepository.getMonitorsForProtected(protectedId)
+
+                val monitorId = if (relations.isNotEmpty()) relations.first().monitorId else ""
+
                 val alert = Alert(
                     protectedId = protectedId,
-                    monitorId = "", // Will be filled for each monitor
+                    monitorId = monitorId,
                     ruleId = "panic_button_${System.currentTimeMillis()}",
                     alertType = pt.isec.a2022143267.safetysec.model.RuleType.PANIC_BUTTON,
                     status = AlertStatus.PENDING
@@ -88,6 +91,9 @@ class AlertViewModel : ViewModel() {
                         val newAlert = alert.copy(id = alertId)
                         _currentAlert.value = newAlert
                         _alertState.value = AlertOperationState.Countdown(alertId)
+
+                        sendAlertToMonitors(newAlert, protectedUser)
+
                         startCountdown(newAlert, protectedUser)
                     }
                     .onFailure { exception ->
