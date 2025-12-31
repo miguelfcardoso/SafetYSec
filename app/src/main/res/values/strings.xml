@@ -221,4 +221,8 @@
     <string name="status_var">Status: %1$s</string>
     <string name="resolved">Resolved</string>
     <string name="cancelled">Cancelled</string>
+    <string name="confirm">Confirm</string>
+    <string name="send_alert">SEND ALERT</string>
+    <string name="panic_alert_e">⚠️ Panic Alert</string>
+    <string name="panic_alert_confirmation">Are you sure you want to send a panic alert to all your monitors?</string>
 </resources>

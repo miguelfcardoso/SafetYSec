@@ -221,4 +221,8 @@
     <string name="status_var">Estado: %1$s</string>
     <string name="resolved">Resolvido</string>
     <string name="cancelled">Cancelado</string>
+    <string name="confirm">Confirmar</string>
+    <string name="send_alert">ENVIAR ALERTA</string>
+    <string name="panic_alert_e">⚠️ Alerta de Pânico</string>
+    <string name="panic_alert_confirmation">Tem a certeza que quer enviar um alerta de pânico a todos os seus monitores?</string>
 </resources>

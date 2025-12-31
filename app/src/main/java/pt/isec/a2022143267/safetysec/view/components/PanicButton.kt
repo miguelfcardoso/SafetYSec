@@ -9,7 +9,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import pt.isec.a2022143267.safetysec.R
 
 @Composable
 fun PanicButton(
@@ -38,7 +40,7 @@ fun PanicButton(
     ) {
         Icon(
             Icons.Default.Warning,
-            contentDescription = "Panic Button",
+            contentDescription = stringResource(R.string.panic_button),
             modifier = Modifier.size(32.dp)
         )
     }
@@ -46,8 +48,8 @@ fun PanicButton(
     if (showConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showConfirmDialog = false },
-            title = { Text("⚠️ Panic Alert") },
-            text = { Text("Are you sure you want to send a panic alert to all your monitors?") },
+            title = { Text(stringResource(R.string.panic_alert_e)) },
+            text = { Text(stringResource(R.string.panic_alert_confirmation)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -58,12 +60,12 @@ fun PanicButton(
                         containerColor = Color.Red
                     )
                 ) {
-                    Text("SEND ALERT")
+                    Text(stringResource(R.string.send_alert))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showConfirmDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
