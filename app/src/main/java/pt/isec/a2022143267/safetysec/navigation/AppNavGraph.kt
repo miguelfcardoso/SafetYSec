@@ -27,6 +27,7 @@ import pt.isec.a2022143267.safetysec.view.protected.HistoryScreen
 import pt.isec.a2022143267.safetysec.view.alert.AlertScreen
 import pt.isec.a2022143267.safetysec.view.auth.MFAScreen
 import pt.isec.a2022143267.safetysec.view.auth.SettingsScreen
+import pt.isec.a2022143267.safetysec.viewmodel.AlertViewModel
 import pt.isec.a2022143267.safetysec.viewmodel.AuthViewModel
 
 /**
@@ -38,6 +39,8 @@ fun AppNavGraph(
     authViewModel: AuthViewModel = viewModel()
 ) {
     val currentUser by authViewModel.currentUser.collectAsState()
+
+    val alertViewModel: AlertViewModel = viewModel()
 
     val startDestination = when {
         currentUser == null -> Screen.Login.route
@@ -141,7 +144,8 @@ fun AppNavGraph(
         composable(Screen.ProtectedDashboard.route) {
             ProtectedDashboardScreen(
                 navController = navController,
-                authViewModel = authViewModel
+                authViewModel = authViewModel,
+                alertViewModel = alertViewModel
             )
         }
 
@@ -180,12 +184,17 @@ fun AppNavGraph(
         }
 
         // Alert screen (shared)
-        composable(Screen.AlertScreen.route) { backStackEntry ->
+        composable(
+            route = Screen.AlertScreen.route,
+            arguments = listOf(navArgument("alertId") { type = NavType.StringType })
+        ) { backStackEntry ->
             val alertId = backStackEntry.arguments?.getString("alertId") ?: ""
+
             AlertScreen(
                 navController = navController,
                 alertId = alertId,
-                authViewModel = authViewModel
+                authViewModel = authViewModel,
+                alertViewModel = alertViewModel
             )
         }
 

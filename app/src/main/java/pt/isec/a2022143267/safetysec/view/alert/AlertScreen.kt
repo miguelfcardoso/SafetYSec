@@ -209,7 +209,7 @@ fun AlertScreen(
             title = { Text(stringResource(R.string.cancel_alert)) },
             text = {
                 Column {
-                    Text(text = stringResource(R.string.enter_cancel_code))
+                    Text(stringResource(R.string.enter_cancel_code))
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = cancelCode,
@@ -223,24 +223,21 @@ fun AlertScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        if (cancelCode == currentUser?.cancelCode) {
-                            alertViewModel.cancelAlert(currentUser?.id ?: "")
-                            showCancelDialog = false
-                        } else {
-                            // Show error
-                        }
+                        alertViewModel.cancelAlert(
+                            inputCode = cancelCode,
+                            correctCode = currentUser?.cancelCode ?: "",
+                            cancelledBy = currentUser?.id ?: ""
+                        )
+                        showCancelDialog = false
                         cancelCode = ""
                     }
                 ) {
-                    Text(stringResource(R.string.cancel))
+                    Text(stringResource(R.string.confirm))
                 }
             },
             dismissButton = {
-                TextButton(onClick = {
-                    showCancelDialog = false
-                    cancelCode = ""
-                }) {
-                    Text(stringResource(R.string.close))
+                TextButton(onClick = { showCancelDialog = false }) {
+                    Text(stringResource(R.string.back))
                 }
             }
         )

@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import pt.isec.a2022143267.safetysec.R
 import pt.isec.a2022143267.safetysec.navigation.Screen
 import pt.isec.a2022143267.safetysec.view.components.PanicButton
+import pt.isec.a2022143267.safetysec.viewmodel.AlertOperationState
 import pt.isec.a2022143267.safetysec.viewmodel.AuthViewModel
 import pt.isec.a2022143267.safetysec.viewmodel.ProtectedViewModel
 
@@ -42,20 +43,11 @@ fun ProtectedDashboardScreen(
 
     // Show alert feedback
     LaunchedEffect(alertState) {
-        when (alertState) {
-            is pt.isec.a2022143267.safetysec.viewmodel.AlertOperationState.Countdown -> {
-                snackbarHostState.showSnackbar(
-                    message = panicAlertMessage,
-                    duration = SnackbarDuration.Short
-                )
-            }
-            is pt.isec.a2022143267.safetysec.viewmodel.AlertOperationState.Error -> {
-                snackbarHostState.showSnackbar(
-                    message = (alertState as pt.isec.a2022143267.safetysec.viewmodel.AlertOperationState.Error).message,
-                    duration = SnackbarDuration.Long
-                )
-            }
-            else -> {}
+        val currentState = alertState
+        if (currentState is AlertOperationState.Countdown) {
+            println("DEBUG: Alerta detetado, a navegar para ID: ${currentState.alertId}")
+
+            navController.navigate(Screen.AlertScreen.createRoute(currentState.alertId))
         }
     }
 

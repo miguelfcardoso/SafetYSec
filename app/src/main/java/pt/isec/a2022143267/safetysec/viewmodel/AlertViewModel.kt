@@ -5,6 +5,7 @@ import androidx.camera.view.PreviewView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,6 +42,8 @@ class AlertViewModel : ViewModel() {
 
     private var isCancelled = false
 
+    private var countdownJob: Job? = null
+
     fun initializeVideoRecording(context: Context, lifecycleOwner: LifecycleOwner) {
         videoRecordingHelper = VideoRecordingHelper(context, lifecycleOwner)
     }
@@ -54,7 +57,7 @@ class AlertViewModel : ViewModel() {
                 .onSuccess { alertId ->
                     val newAlert = alert.copy(id = alertId)
                     _currentAlert.value = newAlert
-                    _alertState.value = AlertOperationState.Countdown
+                    _alertState.value = AlertOperationState.Countdown(alertId)
                     startCountdown(newAlert, protectedUser)
                 }
                 .onFailure { exception ->
@@ -84,7 +87,7 @@ class AlertViewModel : ViewModel() {
                     .onSuccess { alertId ->
                         val newAlert = alert.copy(id = alertId)
                         _currentAlert.value = newAlert
-                        _alertState.value = AlertOperationState.Countdown
+                        _alertState.value = AlertOperationState.Countdown(alertId)
                         startCountdown(newAlert, protectedUser)
                     }
                     .onFailure { exception ->
@@ -116,11 +119,16 @@ class AlertViewModel : ViewModel() {
         activateAlert(alert, protectedUser)
     }
 
+    private fun stopCountdown() {
+        countdownJob?.cancel()
+        countdownJob = null
+    }
+
     private fun activateAlert(alert: Alert, protectedUser: User) {
         viewModelScope.launch {
             alertRepository.updateAlertStatus(alert.id, AlertStatus.ACTIVE)
                 .onSuccess {
-                    _alertState.value = AlertOperationState.Active
+                    _alertState.value = AlertOperationState.Active(alert.id)
                     _isRecordingVideo.value = true
 
                     // Send notifications to all monitors
@@ -198,7 +206,12 @@ class AlertViewModel : ViewModel() {
         }
     }
 
-    fun cancelAlert(cancelledBy: String) {
+    fun cancelAlert(inputCode: String, correctCode: String, cancelledBy: String) {
+        if (inputCode != correctCode) {
+            _alertState.value = AlertOperationState.Error("Código de cancelamento incorreto")
+            return
+        }
+
         val alert = _currentAlert.value ?: return
         isCancelled = true
 
@@ -208,6 +221,7 @@ class AlertViewModel : ViewModel() {
                     _alertState.value = AlertOperationState.Cancelled
                     _countdown.value = 10
                     _isRecordingVideo.value = false
+                    stopCountdown()
                 }
                 .onFailure { exception ->
                     _alertState.value = AlertOperationState.Error(
@@ -244,8 +258,8 @@ class AlertViewModel : ViewModel() {
 sealed class AlertOperationState {
     object Idle : AlertOperationState()
     object Loading : AlertOperationState()
-    object Countdown : AlertOperationState()
-    object Active : AlertOperationState()
+    data class Countdown(val alertId: String) : AlertOperationState()
+    data class Active(val alertId: String) : AlertOperationState()
     object Cancelled : AlertOperationState()
     object VideoRecorded : AlertOperationState()
     data class Error(val message: String) : AlertOperationState()
