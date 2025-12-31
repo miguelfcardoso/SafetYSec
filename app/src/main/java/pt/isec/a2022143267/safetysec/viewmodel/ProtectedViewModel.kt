@@ -207,6 +207,8 @@ class ProtectedViewModel : ViewModel() {
             _operationState.value = OperationState.Loading
             ruleRepository.deleteRule(ruleId)
                 .onSuccess {
+                    _rules.value = _rules.value.filter { it.id != ruleId }
+
                     _operationState.value = OperationState.Success("Rule revoked")
                 }
                 .onFailure { exception ->
