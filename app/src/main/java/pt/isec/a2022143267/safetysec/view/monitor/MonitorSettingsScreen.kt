@@ -17,13 +17,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 import pt.isec.a2022143267.safetysec.R
+import pt.isec.a2022143267.safetysec.data.ThemePreferences
 import pt.isec.a2022143267.safetysec.navigation.Screen
 import pt.isec.a2022143267.safetysec.viewmodel.AuthState
 import pt.isec.a2022143267.safetysec.viewmodel.AuthViewModel
@@ -34,6 +37,11 @@ fun MonitorSettingsScreen(
     navController: NavController,
     authViewModel: AuthViewModel
 ) {
+    val context = LocalContext.current
+    val themePreferences = remember { ThemePreferences(context) }
+    val isDarkMode by themePreferences.isDarkMode.collectAsState(initial = false)
+    val scope = rememberCoroutineScope()
+
     val currentUser by authViewModel.currentUser.collectAsState()
     val authState by authViewModel.authState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -168,6 +176,59 @@ fun MonitorSettingsScreen(
                             )
                         )
                     }
+                }
+            }
+
+            // Appearance/Theme Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            Icons.Default.Star,
+                            contentDescription = null,
+                            modifier = Modifier.size(28.dp),
+                            tint = if (isDarkMode) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column {
+                            Text(
+                                text = "Appearance",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = if (isDarkMode) "Dark Mode" else "Light Mode",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                            )
+                        }
+                    }
+                    Switch(
+                        checked = isDarkMode,
+                        onCheckedChange = {
+                            scope.launch {
+                                themePreferences.toggleDarkMode()
+                            }
+                        },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.primary,
+                            checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    )
                 }
             }
 

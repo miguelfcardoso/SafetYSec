@@ -32,6 +32,7 @@ fun MonitorDashboardScreen(
     val alerts by monitorViewModel.alerts.collectAsState()
     val operationState by monitorViewModel.operationState.collectAsState()
     val alertStats by monitorViewModel.alertStats.collectAsState()
+    val protectedStatuses by monitorViewModel.protectedStatuses.collectAsState()
 
     var showAddDialog by remember { mutableStateOf(false) }
     var otpInput by remember { mutableStateOf("") }
@@ -149,44 +150,17 @@ fun MonitorDashboardScreen(
                 }
             } else {
                 items(protectedUsers) { user ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
+                    val status = protectedStatuses[user.id]
+                    ProtectedUserCard(
+                        user = user,
+                        status = status,
                         onClick = {
                             navController.navigate(
                                 pt.isec.a2022143267.safetysec.navigation.Screen.MonitorProtectedDetails.createRoute(user.id)
                             )
                         }
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                Icons.Default.Person,
-                                contentDescription = null,
-                                modifier = Modifier.size(40.dp)
-                            )
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = user.name,
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                                Text(
-                                    text = user.email,
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                            }
-                            Icon(
-                                Icons.Default.KeyboardArrowRight,
-                                contentDescription = null
-                            )
-                        }
-                    }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
 
@@ -212,6 +186,9 @@ fun MonitorDashboardScreen(
                 items(activeAlerts) { alert ->
                     AlertCard(alert = alert, onClick = {
                         // Navigate to alert details
+                        navController.navigate(
+                            pt.isec.a2022143267.safetysec.navigation.Screen.MonitorAlertDetail.createRoute(alert.id)
+                        )
                     })
                 }
             }
@@ -443,3 +420,154 @@ fun AlertCard(
     }
 }
 
+@Composable
+fun ProtectedUserCard(
+    user: pt.isec.a2022143267.safetysec.model.User,
+    status: pt.isec.a2022143267.safetysec.viewmodel.ProtectedStatus?,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick,
+        colors = CardDefaults.cardColors(
+            containerColor = if (status?.activeAlertsCount ?: 0 > 0) {
+                MaterialTheme.colorScheme.errorContainer
+            } else {
+                MaterialTheme.colorScheme.surface
+            }
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // User icon with status indicator
+            Box {
+                Icon(
+                    Icons.Default.Person,
+                    contentDescription = stringResource(R.string.user_icon),
+                    modifier = Modifier.size(48.dp),
+                    tint = if (status?.activeAlertsCount ?: 0 > 0) {
+                        MaterialTheme.colorScheme.error
+                    } else if (status?.isMonitoringActive == true) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.outline
+                    }
+                )
+
+                // Active alert indicator
+                if (status?.activeAlertsCount ?: 0 > 0) {
+                    Badge(
+                        modifier = Modifier.align(Alignment.TopEnd),
+                        containerColor = MaterialTheme.colorScheme.error
+                    ) {
+                        Text(
+                            text = "${status?.activeAlertsCount}",
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = user.name,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = user.email,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Status information
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Monitoring status
+                    Icon(
+                        if (status?.isMonitoringActive == true) Icons.Default.CheckCircle else Icons.Default.Info,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = if (status?.isMonitoringActive == true) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.outline
+                        }
+                    )
+                    Text(
+                        text = if (status?.isMonitoringActive == true) {
+                            stringResource(R.string.monitoring_active, status.activeRulesCount)
+                        } else {
+                            stringResource(R.string.monitoring_inactive)
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
+
+                // Last alert information
+                status?.lastAlertTime?.let { lastAlertTime ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(top = 2.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Notifications,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.outline
+                        )
+                        Text(
+                            text = stringResource(
+                                R.string.last_alert_time,
+                                pt.isec.a2022143267.safetysec.utils.DateTimeUtils.formatRelativeTime(lastAlertTime)
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    }
+                }
+
+                // Location information
+                status?.lastLocation?.let { location ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(top = 2.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.LocationOn,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.outline
+                        )
+                        Text(
+                            text = stringResource(
+                                R.string.location_coords,
+                                location.latitude,
+                                location.longitude
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    }
+                }
+            }
+
+            Icon(
+                Icons.Default.KeyboardArrowRight,
+                contentDescription = stringResource(R.string.view_details)
+            )
+        }
+    }
+}

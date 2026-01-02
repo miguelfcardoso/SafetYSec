@@ -22,6 +22,9 @@ class AuthViewModel : ViewModel() {
     private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
 
+    private val _otpCode = MutableStateFlow<String>("")
+    val otpCode: StateFlow<String> = _otpCode.asStateFlow()
+
     init {
         checkAuthStatus()
     }
@@ -86,8 +89,38 @@ class AuthViewModel : ViewModel() {
             _authState.value = AuthState.Loading
             authRepository.login(email, password).onSuccess { user ->
                 _currentUser.value = user
-                _authState.value = AuthState.NeedsMFA
-            }.onFailure { _authState.value = AuthState.Error(it.message ?: "Erro") }
+
+                // Generate OTP for MFA
+                authRepository.generateAndStoreOTP(user.id).onSuccess { otp ->
+                    _otpCode.value = otp // Store for development/testing purposes
+                    _authState.value = AuthState.NeedsMFA
+                }.onFailure {
+                    _authState.value = AuthState.Error("Failed to generate OTP: ${it.message}")
+                }
+            }.onFailure {
+                _authState.value = AuthState.Error(it.message ?: "Login failed")
+            }
+        }
+    }
+
+    fun verifyMFACode(enteredCode: String) {
+        val userId = _currentUser.value?.id
+        if (userId == null) {
+            _authState.value = AuthState.Error("User not found")
+            return
+        }
+
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            authRepository.verifyOTP(userId, enteredCode).onSuccess { isValid ->
+                if (isValid) {
+                    _authState.value = AuthState.Authenticated
+                } else {
+                    _authState.value = AuthState.Error("Invalid OTP code")
+                }
+            }.onFailure {
+                _authState.value = AuthState.Error(it.message ?: "OTP verification failed")
+            }
         }
     }
 

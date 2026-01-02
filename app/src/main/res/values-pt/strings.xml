@@ -252,4 +252,21 @@
     <string name="alert_excessive_speed">Alertar quando ultrapassar a velocidade máxima</string>
     <string name="detect_prolonged_inactivity">Deteção de inatividade prolongada</string>
     <string name="manual_panic_alert">Alerta de Pânico Manual (sempre ativo)</string>
+
+    <!-- Dashboard do Monitor - Estado em Tempo Real -->
+    <string name="monitoring_active">Monitorização: %1$d regras ativas</string>
+    <string name="monitoring_inactive">Monitorização inativa</string>
+    <string name="last_alert_time">Último alerta: %1$s</string>
+    <string name="location_coords">Localização: %.4f, %.4f</string>
+    <string name="user_icon">Ícone de Utilizador</string>
+    <string name="view_details">Ver Detalhes</string>
+
+    <!-- Detalhes do Alerta -->
+    <string name="alert_details">Detalhes do Alerta</string>
+    <string name="view_on_map">Ver no Mapa</string>
+    <string name="mark_as_resolved">Marcar como Resolvido</string>
+    <string name="pending">Pendente</string>
+    <string name="video_not_available">Vídeo não disponível</string>
+    <string name="video_storage_not_available">Gravação de vídeo não disponível (requer Firebase Storage)</string>
+    <string name="alert_history">Histórico de Alertas</string>
 </resources>

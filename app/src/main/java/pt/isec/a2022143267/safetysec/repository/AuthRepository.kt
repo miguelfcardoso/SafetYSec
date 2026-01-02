@@ -141,5 +141,151 @@ class AuthRepository {
     private fun generateCancelCode(): String {
         return (1000..9999).random().toString()
     }
+
+    /**
+     * Generate and store OTP for MFA
+     * @return 6-digit OTP code
+     */
+    suspend fun generateAndStoreOTP(userId: String): Result<String> {
+        return try {
+            val otp = (100000..999999).random().toString()
+            val expirationTime = System.currentTimeMillis() + (10 * 60 * 1000) // 10 minutes
+
+            val otpData = mapOf(
+                "otp" to otp,
+                "expiresAt" to expirationTime,
+                "attempts" to 0
+            )
+
+            firestore.collection("users")
+                .document(userId)
+                .update("mfaData", otpData)
+                .await()
+
+            Result.success(otp)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Verify OTP code
+     * @return true if OTP is valid and not expired
+     */
+    suspend fun verifyOTP(userId: String, enteredOTP: String): Result<Boolean> {
+        return try {
+            val userDoc = firestore.collection("users")
+                .document(userId)
+                .get()
+                .await()
+
+            @Suppress("UNCHECKED_CAST")
+            val mfaData = userDoc.get("mfaData") as? Map<String, Any>
+
+            if (mfaData == null) {
+                return Result.success(false)
+            }
+
+            val storedOTP = mfaData["otp"] as? String
+            val expiresAt = mfaData["expiresAt"] as? Long ?: 0L
+            val attempts = (mfaData["attempts"] as? Long)?.toInt() ?: 0
+
+            // Check if OTP is expired
+            if (System.currentTimeMillis() > expiresAt) {
+                return Result.failure(Exception("OTP expired. Please request a new one."))
+            }
+
+            // Check maximum attempts (5 attempts)
+            if (attempts >= 5) {
+                return Result.failure(Exception("Maximum attempts exceeded. Please request a new OTP."))
+            }
+
+            // Verify OTP
+            if (storedOTP == enteredOTP) {
+                // Clear OTP data after successful verification
+                firestore.collection("users")
+                    .document(userId)
+                    .update("mfaData", null)
+                    .await()
+                Result.success(true)
+            } else {
+                // Increment attempts
+                firestore.collection("users")
+                    .document(userId)
+                    .update("mfaData.attempts", attempts + 1)
+                    .await()
+                Result.success(false)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Generate OTP for Monitor-Protected association
+     * @return 6-digit OTP code that expires in 10 minutes
+     */
+    suspend fun generateAssociationOTP(monitorId: String): Result<String> {
+        return try {
+            val otp = (100000..999999).random().toString()
+            val expirationTime = System.currentTimeMillis() + (10 * 60 * 1000) // 10 minutes
+
+            val otpData = mapOf(
+                "associationOTP" to otp,
+                "otpExpiresAt" to expirationTime
+            )
+
+            firestore.collection("users")
+                .document(monitorId)
+                .update(otpData)
+                .await()
+
+            Result.success(otp)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Verify association OTP
+     */
+    suspend fun verifyAssociationOTP(monitorId: String, enteredOTP: String): Result<Boolean> {
+        return try {
+            val userDoc = firestore.collection("users")
+                .document(monitorId)
+                .get()
+                .await()
+
+            val storedOTP = userDoc.getString("associationOTP")
+            val expiresAt = userDoc.getLong("otpExpiresAt") ?: 0L
+
+            // Check if OTP exists
+            if (storedOTP.isNullOrEmpty()) {
+                return Result.failure(Exception("No OTP found. Please request one from the Monitor."))
+            }
+
+            // Check if OTP is expired
+            if (System.currentTimeMillis() > expiresAt) {
+                return Result.failure(Exception("OTP expired. Please request a new one."))
+            }
+
+            // Verify OTP
+            if (storedOTP == enteredOTP) {
+                // Clear OTP after successful verification
+                firestore.collection("users")
+                    .document(monitorId)
+                    .update(mapOf(
+                        "associationOTP" to null,
+                        "otpExpiresAt" to null
+                    ))
+                    .await()
+                Result.success(true)
+            } else {
+                Result.success(false)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
 

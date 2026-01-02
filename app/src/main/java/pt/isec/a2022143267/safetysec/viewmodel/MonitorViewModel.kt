@@ -41,11 +41,47 @@ class MonitorViewModel : ViewModel() {
     private val _alertStats = MutableStateFlow<List<AlertStats>>(emptyList())
     val alertStats: StateFlow<List<AlertStats>> = _alertStats.asStateFlow()
 
+    private val _protectedStatuses = MutableStateFlow<Map<String, ProtectedStatus>>(emptyMap())
+    val protectedStatuses: StateFlow<Map<String, ProtectedStatus>> = _protectedStatuses.asStateFlow()
+
     fun loadProtectedUsers(monitorId: String) {
         viewModelScope.launch {
             userRepository.getProtectedUsers(monitorId).collect { users ->
                 _protectedUsers.value = users
+                // Load status for each protected user
+                users.forEach { user ->
+                    loadProtectedStatus(user.id)
+                }
             }
+        }
+    }
+
+    fun loadProtectedStatus(protectedId: String) {
+        viewModelScope.launch {
+            // Get latest alert
+            val recentAlerts = alertRepository.getRecentAlertsForProtected(protectedId, limit = 1)
+
+            // Get active alerts count
+            val activeAlertsCount = alertRepository.getActiveAlertsCountForProtected(protectedId)
+
+            // Get active rules count
+            val activeRulesCount = ruleRepository.getActiveRulesCountForProtected(protectedId)
+
+            val lastAlert = recentAlerts.firstOrNull()
+
+            val status = ProtectedStatus(
+                protectedId = protectedId,
+                lastAlertTime = lastAlert?.timestamp,
+                lastAlertType = lastAlert?.alertType,
+                lastLocation = lastAlert?.location,
+                activeAlertsCount = activeAlertsCount,
+                activeRulesCount = activeRulesCount,
+                isMonitoringActive = activeRulesCount > 0
+            )
+
+            val currentStatuses = _protectedStatuses.value.toMutableMap()
+            currentStatuses[protectedId] = status
+            _protectedStatuses.value = currentStatuses
         }
     }
 
@@ -180,12 +216,52 @@ class MonitorViewModel : ViewModel() {
     fun resetOperationState() {
         _operationState.value = OperationState.Idle
     }
+
+    suspend fun getAlertById(alertId: String): Result<Alert> {
+        return alertRepository.getAlertById(alertId)
+    }
+
+    suspend fun getUserById(userId: String): Result<User> {
+        return userRepository.getUserById(userId)
+    }
+
+    fun updateAlertStatus(alertId: String, status: AlertStatus) {
+        viewModelScope.launch {
+            alertRepository.updateAlertStatus(alertId, status)
+                .onSuccess {
+                    _operationState.value = OperationState.Success("Alert status updated")
+                }
+                .onFailure { exception ->
+                    _operationState.value = OperationState.Error(
+                        exception.message ?: "Failed to update alert status"
+                    )
+                }
+        }
+    }
+
+    fun loadAlertsForProtected(protectedId: String) {
+        viewModelScope.launch {
+            alertRepository.getAlertsForProtected(protectedId).collect { alerts ->
+                _alerts.value = alerts
+            }
+        }
+    }
 }
 
 data class AlertStats(
     val type: RuleType,
     val count: Int,
     val percentage: Float
+)
+
+data class ProtectedStatus(
+    val protectedId: String,
+    val lastAlertTime: com.google.firebase.Timestamp? = null,
+    val lastAlertType: RuleType? = null,
+    val lastLocation: com.google.firebase.firestore.GeoPoint? = null,
+    val activeAlertsCount: Int = 0,
+    val activeRulesCount: Int = 0,
+    val isMonitoringActive: Boolean = false
 )
 
 sealed class OperationState {

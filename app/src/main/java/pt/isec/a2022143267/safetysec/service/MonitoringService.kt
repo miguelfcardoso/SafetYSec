@@ -51,9 +51,16 @@ class MonitoringService : Service(), SensorEventListener {
     private val fallAccelerationThreshold = 25.0f // m/s² for fall detection
     private val accidentDecelerationThreshold = -15.0f // m/s² for accident (negative = deceleration)
     private val inactivityThresholdMillis = 30 * 60 * 1000L // 30 minutes default
+    private val immobilityAfterFallThreshold = 2.0f // m/s² - threshold for immobility
+    private val immobilityCheckDurationMillis = 3000L // 3 seconds to check immobility
 
     private var previousAcceleration = 0f
     private var activeRules = mutableListOf<Rule>()
+
+    // Fall detection state
+    private var possibleFallTime: Long? = null
+    private var accelerationsAfterFall = mutableListOf<Float>()
+    private var isCheckingFallImmobility = false
 
     companion object {
         private const val NOTIFICATION_ID = 1
@@ -194,9 +201,28 @@ class MonitoringService : Service(), SensorEventListener {
             // Calculate total acceleration
             val acceleration = sqrt(x * x + y * y + z * z)
 
-            // Detect fall (sudden HIGH acceleration)
-            if (acceleration > fallAccelerationThreshold) {
-                detectFall()
+            // Check if we're monitoring immobility after a potential fall
+            if (isCheckingFallImmobility) {
+                accelerationsAfterFall.add(acceleration)
+                val elapsedTime = System.currentTimeMillis() - (possibleFallTime ?: 0)
+
+                if (elapsedTime >= immobilityCheckDurationMillis) {
+                    // Check if user remained immobile (low acceleration readings)
+                    val avgAcceleration = accelerationsAfterFall.average().toFloat()
+                    if (avgAcceleration < immobilityAfterFallThreshold) {
+                        // Confirmed fall with immobility - trigger alert
+                        confirmFall()
+                    }
+                    // Reset fall detection state
+                    resetFallDetectionState()
+                }
+            } else {
+                // Detect potential fall (sudden HIGH acceleration)
+                if (acceleration > fallAccelerationThreshold && !isCheckingFallImmobility) {
+                    possibleFallTime = System.currentTimeMillis()
+                    isCheckingFallImmobility = true
+                    accelerationsAfterFall.clear()
+                }
             }
 
             // Detect accident (sudden DECELERATION)
@@ -214,9 +240,19 @@ class MonitoringService : Service(), SensorEventListener {
         // Not needed for this implementation
     }
 
-    private fun detectFall() {
+    private fun resetFallDetectionState() {
+        isCheckingFallImmobility = false
+        possibleFallTime = null
+        accelerationsAfterFall.clear()
+    }
+
+    private fun confirmFall() {
         val rule = activeRules.find { it.ruleType == RuleType.FALL_DETECTION } ?: return
-        triggerAlert(rule, RuleType.FALL_DETECTION, emptyMap())
+        val data = mapOf(
+            "immobilityDuration" to "${immobilityCheckDurationMillis / 1000}s",
+            "confirmed" to "true"
+        )
+        triggerAlert(rule, RuleType.FALL_DETECTION, data)
     }
 
     private fun detectAccident(deceleration: Float) {
@@ -250,22 +286,61 @@ class MonitoringService : Service(), SensorEventListener {
                 }
             }
 
-            // Check geofencing
+            // Check geofencing - support for multiple areas
             activeRules.filter { it.ruleType == RuleType.GEOFENCING }.forEach { rule ->
-                rule.parameters.geoPoint?.let { center ->
-                    val isInside = LocationUtils.isInsideGeofence(
-                        location,
-                        center,
-                        rule.parameters.radius
-                    )
+                // Check new multiple geofence areas
+                if (rule.parameters.geoPoints.isNotEmpty()) {
+                    var isInsideAnyArea = false
+                    var closestDistance = Double.MAX_VALUE
+                    var closestAreaName = ""
 
-                    if (!isInside) {
-                        val distance = LocationUtils.calculateDistance(
-                            GeoPoint(location.latitude, location.longitude),
-                            center
+                    rule.parameters.geoPoints.forEach { geofenceArea ->
+                        val isInside = LocationUtils.isInsideGeofence(
+                            location,
+                            geofenceArea.center,
+                            geofenceArea.radius
                         )
-                        val data = mapOf("distance" to distance.toString())
+
+                        if (isInside) {
+                            isInsideAnyArea = true
+                        } else {
+                            val distance = LocationUtils.calculateDistance(
+                                GeoPoint(location.latitude, location.longitude),
+                                geofenceArea.center
+                            )
+                            if (distance < closestDistance) {
+                                closestDistance = distance
+                                closestAreaName = geofenceArea.name.ifEmpty { "Area" }
+                            }
+                        }
+                    }
+
+                    // Trigger alert if outside all defined areas
+                    if (!isInsideAnyArea) {
+                        val data = mapOf(
+                            "distance" to closestDistance.toString(),
+                            "closestArea" to closestAreaName,
+                            "totalAreas" to rule.parameters.geoPoints.size.toString()
+                        )
                         triggerAlert(rule, RuleType.GEOFENCING, data)
+                    }
+                } else {
+                    // Backward compatibility: check single geoPoint
+                    rule.parameters.geoPoint?.let { center ->
+                        val isInside = LocationUtils.isInsideGeofence(
+                            location,
+                            center,
+                            rule.parameters.radius
+                        )
+
+                        if (!isInside) {
+                            val distance = LocationUtils.calculateDistance(
+                                GeoPoint(location.latitude, location.longitude),
+                                center
+                            )
+                            val data = mapOf("distance" to distance.toString())
+                            triggerAlert(rule, RuleType.GEOFENCING, data)
+                        }
                     }
                 }
             }

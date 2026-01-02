@@ -42,5 +42,15 @@ sealed class Screen(val route: String) {
     object AlertScreen : Screen("alert_screen/{alertId}") {
         fun createRoute(alertId: String) = "alert_screen/$alertId"
     }
+
+    // Monitor Alert Detail screen
+    object MonitorAlertDetail : Screen("monitor_alert_detail/{alertId}") {
+        fun createRoute(alertId: String) = "monitor_alert_detail/$alertId"
+    }
+
+    // Monitor Protected Alert History screen
+    object MonitorProtectedAlertHistory : Screen("monitor_protected_alert_history/{protectedId}") {
+        fun createRoute(protectedId: String) = "monitor_protected_alert_history/$protectedId"
+    }
 }
 

@@ -152,6 +152,23 @@ fun ProtectedDetailsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
+            // Alert History Button
+            item {
+                Button(
+                    onClick = {
+                        navController.navigate(
+                            pt.isec.a2022143267.safetysec.navigation.Screen.MonitorProtectedAlertHistory.createRoute(protectedUser.id)
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Notifications, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.alert_history))
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
             // Rules Section
             item {
                 Text(

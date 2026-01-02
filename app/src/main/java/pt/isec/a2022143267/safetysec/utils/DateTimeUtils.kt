@@ -72,5 +72,30 @@ object DateTimeUtils {
 
         return currentMinutes in startMinutes..endMinutes
     }
-}
 
+    /**
+     * Format a timestamp as relative time (e.g., "5 minutes ago", "2 hours ago")
+     */
+    fun formatRelativeTime(timestamp: com.google.firebase.Timestamp): String {
+        val now = System.currentTimeMillis()
+        val then = timestamp.toDate().time
+        val diff = now - then
+
+        return when {
+            diff < 60 * 1000 -> "just now"
+            diff < 60 * 60 * 1000 -> {
+                val minutes = (diff / (60 * 1000)).toInt()
+                "$minutes minute${if (minutes != 1) "s" else ""} ago"
+            }
+            diff < 24 * 60 * 60 * 1000 -> {
+                val hours = (diff / (60 * 60 * 1000)).toInt()
+                "$hours hour${if (hours != 1) "s" else ""} ago"
+            }
+            diff < 7 * 24 * 60 * 60 * 1000 -> {
+                val days = (diff / (24 * 60 * 60 * 1000)).toInt()
+                "$days day${if (days != 1) "s" else ""} ago"
+            }
+            else -> formatDateTime(timestamp)
+        }
+    }
+}

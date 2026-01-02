@@ -122,6 +122,30 @@ class VideoRecordingHelper(
         userId: String,
         alertId: String
     ): String {
+        // Firebase Storage is not available in free plan
+        // Alternative solution: Keep video locally and return local path
+
+        // Move video to a permanent location with proper naming
+        val permanentDir = File(context.getExternalFilesDir(null), "alert_videos")
+        if (!permanentDir.exists()) {
+            permanentDir.mkdirs()
+        }
+
+        val permanentFile = File(permanentDir, "${alertId}_video.mp4")
+
+        try {
+            videoFile.copyTo(permanentFile, overwrite = true)
+            videoFile.delete() // Remove temporary file
+
+            // Return local file path as "video URL"
+            // This will be stored in Firestore and can be accessed later
+            return "local://${permanentFile.absolutePath}"
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return ""
+        }
+
+        /* Original Firebase Storage code (requires paid plan):
         val storage = FirebaseStorage.getInstance()
         val videoRef = storage.reference
             .child("videos")
@@ -129,15 +153,34 @@ class VideoRecordingHelper(
             .child("${alertId}_video.mp4")
 
         val uploadTask = videoRef.putFile(Uri.fromFile(videoFile))
-
         uploadTask.await()
 
         val downloadUrl = videoRef.downloadUrl.await()
-
-        // Delete local file after upload
         videoFile.delete()
-
         return downloadUrl.toString()
+        */
+    }
+
+    /**
+     * Get local video file from a local:// URL
+     */
+    fun getLocalVideoFile(localUrl: String): File? {
+        if (!localUrl.startsWith("local://")) return null
+        val path = localUrl.removePrefix("local://")
+        val file = File(path)
+        return if (file.exists()) file else null
+    }
+
+    /**
+     * Delete local video file
+     */
+    fun deleteLocalVideo(localUrl: String): Boolean {
+        val file = getLocalVideoFile(localUrl) ?: return false
+        return try {
+            file.delete()
+        } catch (e: Exception) {
+            false
+        }
     }
 }
 

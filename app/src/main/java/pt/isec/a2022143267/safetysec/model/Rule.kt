@@ -40,15 +40,29 @@ enum class RuleType {
 
 /**
  * Rule parameters
- * @param geoPoint Geographic point for geofencing
+ * @param geoPoint Geographic point for geofencing (deprecated - use geoPoints)
  * @param radius Radius in meters for geofencing
  * @param maxSpeed Maximum speed in km/h for speed control
  * @param inactivityMinutes Minutes of inactivity before alert
+ * @param geoPoints List of geographic points for multiple geofencing areas
  */
 data class RuleParameters(
-    val geoPoint: GeoPoint? = null,
+    val geoPoint: GeoPoint? = null, // Kept for backward compatibility
     val radius: Double = 100.0,
     val maxSpeed: Double = 80.0,
-    val inactivityMinutes: Int = 30
+    val inactivityMinutes: Int = 30,
+    val geoPoints: List<GeofenceArea> = emptyList() // Multiple geofence support
+)
+
+/**
+ * Geofence area definition
+ * @param center Geographic center point
+ * @param radius Radius in meters
+ * @param name Optional name for the area
+ */
+data class GeofenceArea(
+    val center: GeoPoint = GeoPoint(0.0, 0.0),
+    val radius: Double = 100.0,
+    val name: String = ""
 )
 

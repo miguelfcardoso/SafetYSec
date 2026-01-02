@@ -201,4 +201,41 @@ class AlertRepository {
             Result.failure(e)
         }
     }
+
+    /**
+     * Get recent alerts for a protected user (non-realtime, for status check)
+     */
+    suspend fun getRecentAlertsForProtected(protectedId: String, limit: Int = 10): List<Alert> {
+        return try {
+            val snapshot = firestore.collection("alerts")
+                .whereEqualTo("protectedId", protectedId)
+                .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .limit(limit.toLong())
+                .get()
+                .await()
+
+            snapshot.documents.mapNotNull {
+                it.toObject(Alert::class.java)
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    /**
+     * Get count of active alerts for a protected user
+     */
+    suspend fun getActiveAlertsCountForProtected(protectedId: String): Int {
+        return try {
+            val snapshot = firestore.collection("alerts")
+                .whereEqualTo("protectedId", protectedId)
+                .whereEqualTo("status", AlertStatus.ACTIVE.name)
+                .get()
+                .await()
+
+            snapshot.documents.size
+        } catch (e: Exception) {
+            0
+        }
+    }
 }

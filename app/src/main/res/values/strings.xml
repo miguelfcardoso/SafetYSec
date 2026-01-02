@@ -252,4 +252,21 @@
     <string name="alert_excessive_speed">Alert on excessive speed</string>
     <string name="detect_prolonged_inactivity">Detect prolonged inactivity</string>
     <string name="manual_panic_alert">Manual panic alert (always active)</string>
+
+    <!-- Monitor Dashboard - Real-time Status -->
+    <string name="monitoring_active">Monitoring: %1$d rules active</string>
+    <string name="monitoring_inactive">Monitoring inactive</string>
+    <string name="last_alert_time">Last alert: %1$s</string>
+    <string name="location_coords">Location: %.4f, %.4f</string>
+    <string name="user_icon">User Icon</string>
+    <string name="view_details">View Details</string>
+
+    <!-- Alert Details -->
+    <string name="alert_details">Alert Details</string>
+    <string name="view_on_map">View on Map</string>
+    <string name="mark_as_resolved">Mark as Resolved</string>
+    <string name="pending">Pending</string>
+    <string name="video_not_available">Video not available</string>
+    <string name="video_storage_not_available">Video recording is not available (Firebase Storage required)</string>
+    <string name="alert_history">Alert History</string>
 </resources>

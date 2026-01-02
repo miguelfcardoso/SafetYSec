@@ -192,4 +192,21 @@ class RuleRepository {
             Result.failure(e)
         }
     }
+
+    /**
+     * Get count of active rules for a protected user
+     */
+    suspend fun getActiveRulesCountForProtected(protectedId: String): Int {
+        return try {
+            val snapshot = firestore.collection("rules")
+                .whereEqualTo("protectedId", protectedId)
+                .whereEqualTo("isEnabled", true)
+                .get()
+                .await()
+
+            snapshot.documents.size
+        } catch (e: Exception) {
+            0
+        }
+    }
 }

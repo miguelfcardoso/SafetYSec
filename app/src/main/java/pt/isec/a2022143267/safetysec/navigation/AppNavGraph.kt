@@ -22,6 +22,8 @@ import pt.isec.a2022143267.safetysec.view.auth.RegisterScreen
 import pt.isec.a2022143267.safetysec.view.auth.ForgotPasswordScreen
 import pt.isec.a2022143267.safetysec.view.monitor.MonitorDashboardScreen
 import pt.isec.a2022143267.safetysec.view.monitor.MonitorSettingsScreen
+import pt.isec.a2022143267.safetysec.view.monitor.MonitorAlertDetailScreen
+import pt.isec.a2022143267.safetysec.view.monitor.MonitorProtectedAlertHistoryScreen
 import pt.isec.a2022143267.safetysec.view.protected.ProtectedDashboardScreen
 import pt.isec.a2022143267.safetysec.view.protected.HistoryScreen
 import pt.isec.a2022143267.safetysec.view.alert.AlertScreen
@@ -195,6 +197,34 @@ fun AppNavGraph(
                 alertId = alertId,
                 authViewModel = authViewModel,
                 alertViewModel = alertViewModel
+            )
+        }
+
+        // Monitor Alert Detail screen
+        composable(
+            route = Screen.MonitorAlertDetail.route,
+            arguments = listOf(navArgument("alertId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val alertId = backStackEntry.arguments?.getString("alertId") ?: ""
+
+            MonitorAlertDetailScreen(
+                navController = navController,
+                alertId = alertId,
+                authViewModel = authViewModel
+            )
+        }
+
+        // Monitor Protected Alert History screen
+        composable(
+            route = Screen.MonitorProtectedAlertHistory.route,
+            arguments = listOf(navArgument("protectedId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val protectedId = backStackEntry.arguments?.getString("protectedId") ?: ""
+
+            MonitorProtectedAlertHistoryScreen(
+                navController = navController,
+                protectedId = protectedId,
+                authViewModel = authViewModel
             )
         }
 
